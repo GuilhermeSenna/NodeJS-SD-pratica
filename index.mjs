@@ -20,6 +20,6 @@ app.post('/', (req, res) => {
     res.send('Hello Post!')
 });
 
-app.listen(process.env.PORT | 8000, () => {
+app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 })
