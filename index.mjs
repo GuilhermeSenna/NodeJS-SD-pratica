@@ -28,6 +28,10 @@ app.get('/pag3', (req, res) => {
     res.send('Página 3')
 });
 
+app.get('/', (req, res) => {
+    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello')
+});
+
 app.post('/', (req, res) => {
     res.send('Hello Post!')
 });
