@@ -29,7 +29,7 @@ app.get('/pag3', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello')
+    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver')
 });
 
 app.get('/resolver', (req, res) => {
