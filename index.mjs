@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
 
 app.get('/resolver', (req, res) => {
 
+    // Objeto 'links' com o nome dos alunos e seus respectivos deploys
     let links = {
         'hiago': 'https://sd-api-uesc.herokuapp.com/',
         'robert': 'https://pratica-sd.herokuapp.com/',
@@ -45,14 +46,14 @@ app.get('/resolver', (req, res) => {
         'emmanuel': 'https://sd-emmanuel.herokuapp.com/'
     }
 
-    if(!req.query.nome){
-        res.send(links);
-    }else{
-        let nome = req.query.nome;
-        if (links[`${nome}`] !== undefined){
-            res.send(links[nome]);
+    if(!req.query.nome){                                // Caso acesse o link sem passar parametro
+        res.send(links);                                // Mostra o objeto links para o usuário poder escolher
+    }else{                                              // Caso passe o parametro
+        let nome = req.query.nome;                      // Armazena o parametro na variavel nome
+        if (links[`${nome}`] !== undefined){            // Checa se o nome/parametro é uma chave (aluno) do objeto
+            res.send(links[nome]);                      // Caso seja mostra o valor da chave (link)
         }else{
-            res.send('Não existe esse nome na lista.');
+            res.send('Não existe esse nome na lista.'); // Caso não esteja no objeto, avisa ao usuário
         }
     }
 });
