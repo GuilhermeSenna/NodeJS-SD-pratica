@@ -32,6 +32,31 @@ app.get('/', (req, res) => {
     res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello')
 });
 
+app.get('/resolver', (req, res) => {
+
+    let links = {
+        'hiago': 'https://sd-api-uesc.herokuapp.com/',
+        'robert': 'https://pratica-sd.herokuapp.com/',
+        'luis': 'https://sd-20212-luiscarlos.herokuapp.com/',
+        'joao': 'https://sd-joaopedrop-20212.herokuapp.com/',
+        'guilherme': 'https://nodejs-sd-guilhermesenna.herokuapp.com/',
+        'allana': 'https://sd-ascampos-20212.herokuapp.com/',
+        'jenilson': 'https://jenilsonramos-sd-20211.herokuapp.com/',
+        'emmanuel': 'https://sd-emmanuel.herokuapp.com/'
+    }
+
+    if(!req.query.nome){
+        res.send(links);
+    }else{
+        let nome = req.query.nome;
+        if (links[`${nome}`] !== undefined){
+            res.send(links[nome]);
+        }else{
+            res.send('Não existe esse nome na lista.');
+        }
+    }
+});
+
 app.post('/', (req, res) => {
     res.send('Hello Post!')
 });
