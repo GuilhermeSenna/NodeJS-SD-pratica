@@ -80,19 +80,27 @@ app.post('/resolver', (req, res) => {
 
     if(Object.values(req.body).length === 0){          // Checa se o JSON está vazio
         res.send(links)
-    }else if(!('nome' in req.body)){                   // Checa se existe a chave nome na requisição enviada
-        res.send('Chave incorreta, use a chave "nome"')
+    }else if(!('arguments' in req.body) || !('operacao' in req.body)){ // Checa se há as chaves 'arguments' e 'operacao'
+        res.send('As chaves estão erradas')
+    }else if(Object.values(req.body.operacao).length === 0){ // Checa se o conteúdo de arguments está vazio
+        res.send('O conteúdo da chave "operacao" está vazio')
     }
-    else{                                               // Caso seja válido as verificações na chave e JSON não-vazio
-        let nome = req.body.nome;                       // Armazena o parametro na variavel nome
+    else if(Object.values(req.body.arguments).length === 0){ // Checa se o conteúdo de arguments está vazio
+        res.send('O conteúdo da chave "arguments" está vazio')
+    }
+    else if(!('nome' in req.body.arguments)){                 // Checa se há a chave 'nome' em arguments
+        res.send('Não há a chave "nome" em "arguments".')
+    }
+    else{                                                      // Caso seja válido as verificações na chave e JSON não-vazio
+        let nome = req.body.arguments.nome;                    // Armazena o parametro na variavel nome
         if(!nome){
-            res.send('Campo vazio, insira algum nome!') // Confere se o valor da chave está vazio
+            res.send('Campo vazio, insira algum nome!')         // Confere se o valor da chave está vazio
         }
-        else if (links[`${nome}`] !== undefined){       // Checa se o nome/parametro é uma chave (aluno) do objeto
-            res.send(links[nome]);                      // Caso seja mostra o valor da chave (link)
+        else if (links[`${nome}`] !== undefined){               // Checa se o nome/parametro é uma chave (aluno) do objeto
+            res.send(links[nome]);                              // Caso seja mostra o valor da chave (link)
         }
         else{
-            res.send('Não existe esse nome na lista.'); // Caso não esteja no objeto, avisa ao usuário
+            res.send('Não existe esse nome na lista.');         // Caso não esteja no objeto, avisa ao usuário
         }
     }
 });
