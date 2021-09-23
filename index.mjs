@@ -80,12 +80,12 @@ app.post('/resolver', (req, res) => {
 
     if(Object.values(req.body).length === 0){          // Checa se o JSON está vazio
         res.send(links)
-    }else if(!('nome' in req.body)){                   // Checa se existe a chave nome no JSON
+    }else if(!('nome' in req.body)){                   // Checa se existe a chave nome na requisição enviada
         res.send('Chave incorreta, use a chave "nome"')
     }
-    else{                                               // Caso passe o parametro
+    else{                                               // Caso seja válido as verificações na chave e JSON não-vazio
         let nome = req.body.nome;                       // Armazena o parametro na variavel nome
-        if (links[`${nome}`] !== undefined){            // Checa se o nome/parametro é uma chave (aluno) do objeto
+        if (links[`${nome}`] !== undefined){            // Checa se o nome/parametro é uma chave (aluno) do objeto links
             res.send(links[nome]);                      // Caso seja mostra o valor da chave (link)
         }else if(!nome){
             res.send('Campo vazio, insira algum nome!') // Confere se o valor da chave está vazio
