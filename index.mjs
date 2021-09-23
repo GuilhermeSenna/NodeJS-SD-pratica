@@ -85,10 +85,12 @@ app.post('/resolver', (req, res) => {
     }
     else{                                               // Caso passe o parametro
         let nome = req.body.nome;                       // Armazena o parametro na variavel nome
-        if (links[`${nome}`] !== undefined){            // Checa se o nome/parametro é uma chave (aluno) do objeto
-            res.send(links[nome]);                      // Caso seja mostra o valor da chave (link)
-        }else if(!nome){
+
+        if(!nome){
             res.send('Campo vazio, insira algum nome!') // Confere se o valor da chave está vazio
+        }
+        else if (links[`${nome}`] !== undefined){       // Checa se o nome/parametro é uma chave (aluno) do objeto
+            res.send(links[nome]);                      // Caso seja mostra o valor da chave (link)
         }
         else{
             res.send('Não existe esse nome na lista.'); // Caso não esteja no objeto, avisa ao usuário
