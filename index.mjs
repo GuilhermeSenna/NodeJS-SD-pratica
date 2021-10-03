@@ -9,6 +9,14 @@ const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver')
+});
+
+app.post('/', (req, res) => {
+    res.send('Hello Post!')
+});
+
 app.get('/hello', (req, res) => {
     if (req.query.name) {
         res.send(`Hello ${req.query.name}!`)
@@ -32,10 +40,6 @@ app.get('/pag2', (req, res) => {
 
 app.get('/pag3', (req, res) => {
     res.send('Página 3')
-});
-
-app.get('/', (req, res) => {
-    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver')
 });
 
 
@@ -413,10 +417,6 @@ app.post('/resolver', (req, res) => {
             res.send('Não existe esse nome na lista.');         // Caso não esteja no objeto, avisa ao usuário
         }
     }
-});
-
-app.post('/', (req, res) => {
-    res.send('Hello Post!')
 });
 
 app.listen(process.env.PORT || 8000, () => {
