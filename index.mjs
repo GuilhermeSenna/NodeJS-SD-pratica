@@ -2,7 +2,7 @@
 
 import express from 'express';
 
-// File Server - Lidar com arquivos
+// File System - Lidar com arquivos
 import fs from 'fs';
 
 const app = express()
