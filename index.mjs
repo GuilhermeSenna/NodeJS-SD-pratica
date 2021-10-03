@@ -78,32 +78,80 @@ app.put('/info', (req, res) => {
         'tipo_de_eleicao_ativa'
     ]
 
+    let check = true;
+
     // Tenta ler o arquivo message.json
     if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
         return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
     } else {
         Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
             if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
+                check = false;
                 return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
             } else if (!key) {
+                check = false;
                 return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
             } else if (!req.body[key]) {
+                check = false;
                 return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
             } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
+                check = false;
                 return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
             }
         })
     }
 
-    // Faz o parser correto para JSON, senão o arquivo é escrito como: '[object object]'
-    let json = JSON.stringify(req.body);
+    if (check) {
+        // Faz o parser correto para JSON, senão o arquivo é escrito como: '[object object]'
+        let json = JSON.stringify(req.body);
 
-    // Atualiza o conteúdo do info.json
-    fs.writeFile('info.json', json, function (err) {
-        if (err) throw err;
-        res.send('O conteúdo foi atualizado com sucesso!');
-    });
+        // Tenta ler o arquivo info.json
+        fs.readFile('info.json', function (err, data) {
+            if (!err) {           // Se não houver erros...
+                let peers_file = JSON.parse(data);
+                check = true;
 
+                // Essas checagens ocorrem porque algumas chaves podem ser passadas vazias, ou alterar apenas parcialmente
+                if (req.body.server_name) {
+                    peers_file.server_name = req.body.server_name;
+                }
+
+                if (req.body.server_endpoint) {
+                    peers_file.server_endpoint = req.body.server_endpoint;
+                }
+
+                if (req.body.descrição) {
+                    peers_file.descrição = req.body.descrição;
+                }
+
+                if (req.body.versao) {
+                    peers_file.versao = req.body.versao;
+                }
+
+                if (req.body.Status) {
+                    peers_file.Status = req.body.Status;
+                }
+
+                if (req.body.tipo_de_eleicao_ativa) {
+                    peers_file.tipo_de_eleicao_ativa = req.body.tipo_de_eleicao_ativa;
+                }
+
+                if (check) {
+                    var json = JSON.stringify(peers_file);
+                    // Atualiza o conteúdo do info.json
+                    fs.writeFile('info.json', json, function (err) {
+                        if (err) throw err;
+                        res.send('O conteúdo foi atualizado com sucesso!');
+                    });
+                }
+
+
+            } else {
+                return res.send(err);    // Retorna o erro.
+            }
+        });
+
+    }
 });
 
 // [GET] /peers
@@ -276,9 +324,6 @@ app.put('/peers/:id', (req, res) => {
             // Checar se o ID solicitado na requisição é usado por outro usuário (evitar duplicidade)
             check = true;
 
-            // Checar se o ID solicitado pela URL é usado por algum usuário
-            let check2 = true;
-
             // Checa se o nome e o ID solicitado para alteração já não é usado por outro usuário
             for (var i = 0; i < peers_file.length; i++) {
                 if (peers_file[i].id == req.body.id || peers_file[i].nome == req.body.nome) {
@@ -306,7 +351,6 @@ app.put('/peers/:id', (req, res) => {
                         if (req.body.url) {
                             peers_file[i].url = req.body.url;
                         }
-
 
                         check = true;
                         break;
