@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver')
+    res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver, /info, /peers, /peers/ID')
 });
 
 app.post('/', (req, res) => {
