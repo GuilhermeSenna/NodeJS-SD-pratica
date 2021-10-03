@@ -20,3 +20,7 @@
 - Checa se todas as chaves necessárias estão inseridas na requisição
 - Checa se o usuário está tentando inserir um valor UNIQUE (ID e NOME) - Peers
 - Checa se está buscando um usuário por ID inexistente
+
+### Funcionalidades:
+- Permite alterar só o que foi passado (Aonde não há chaves necessárias, como no método PUT)
+- Ao editar um peer, checa se o novo ID/nome já não está sendo usado por outro usuário
