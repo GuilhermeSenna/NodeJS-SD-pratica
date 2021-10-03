@@ -1,13 +1,3 @@
-# Aluguel em dia
-## Sistema para locação de imóveis automático.
-
-
-> Pasta do template:
-Rocker/vertical
-
-
----
-
 # NodeJS-SD-pratica
  
 ### Programa utilizado para disciplina de SD (Sistemas distribuídos) sendo realizado um deploy no heroku.
@@ -30,4 +20,3 @@ Rocker/vertical
 - Checa se todas as chaves necessárias estão inseridas na requisição
 - Checa se o usuário está tentando inserir um valor UNIQUE (ID e NOME) - Peers
 - Checa se está buscando um usuário por ID inexistente
-
