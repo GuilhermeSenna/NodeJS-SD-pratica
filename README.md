@@ -14,7 +14,7 @@
 
 ### Checagens:
 - Checa se o corpo da requisição está vazio
-- Checa se há chaves sem valor (vazio)
+- Checa se há chaves com valor vazio
 - Checa se há chaves vazias
 - Checa se a chave inserida é válida (Array com as chaves possíveis) - Case and Accent sensitive
 - Checa se todas as chaves necessárias estão inseridas na requisição
