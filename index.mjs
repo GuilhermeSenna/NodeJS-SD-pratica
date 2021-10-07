@@ -74,7 +74,7 @@ app.put('/info', (req, res) => {
         'server_endpoint',
         'descrição',
         'versao',
-        'Status',
+        'status',
         'tipo_de_eleicao_ativa'
     ]
 
@@ -128,8 +128,8 @@ app.put('/info', (req, res) => {
                     peers_file.versao = req.body.versao;
                 }
 
-                if (req.body.Status) {
-                    peers_file.Status = req.body.Status;
+                if (req.body.status) {
+                    peers_file.status = req.body.status;
                 }
 
                 if (req.body.tipo_de_eleicao_ativa) {
@@ -219,9 +219,16 @@ app.post('/peers', (req, res) => {
 
             if (check) {
                 for (var i = 0; i < peers_file.length; i++) {
-                    if (peers_file[i].id == req.body.id || peers_file[i].nome == req.body.nome) {
+                    if (peers_file[i].id == req.body.id && peers_file[i].nome == req.body.nome) {
                         check = false;
-                        return res.status(409).json({ status: 409, message: `Já existe esse ID/Nome cadastrado.` });
+                        return res.status(409).json({ status: 409, message: `Já existe esse ID e nome cadastrados.` });
+                    }
+                    else if (peers_file[i].id == req.body.id) {
+                        check = false;
+                        return res.status(409).json({ status: 409, message: `Já existe esse ID cadastrado.` });
+                    }else if(peers_file[i].nome == req.body.nome){
+                        check = false;
+                        return res.status(409).json({ status: 409, message: `Já existe esse nome cadastrado.` });
                     }
                 }
             }
@@ -402,7 +409,7 @@ app.delete('/peers/:id', (req, res) => {
                 var json = JSON.stringify(peers);
                 fs.writeFile('peers.json', json, function (err) {
                     if (err) throw err;
-                    return res.status(200).json({ status: 200, message: `O peer selecionado foi alterado com sucesso!` });
+                    return res.status(200).json({ status: 200, message: `O peer selecionado foi removido com sucesso!` });
                 });
             } else {
                 // Caso não ache
