@@ -9,6 +9,125 @@ const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+let info_default = {
+    "server_name": "server",
+    "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
+    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, etc",
+    "versao": "0.1",
+    "status": "online",
+    "tipo_de_eleicao_ativa": "ring"
+}
+
+let peers_default = [
+    {
+        "id": "201720295",
+        "nome": "Allana Dos Santos Campos",
+        "url": "https://sd-ascampos-20212.herokuapp.com/"
+    },
+    {
+        "id": "201512136",
+        "nome": "Annya Rita De Souza Ourives",
+        "url": "https://sd-annyaourives-20212.herokuapp.com/hello"
+    },
+    {
+        "id": "201512137",
+        "nome": "Daniel Andrade Penêdo Santos",
+        "url": ""
+    },
+    {
+        "id": "201710375",
+        "nome": "Emmanuel Norberto Ribeiro Dos Santos",
+        "url": "https://sd-emmanuel.herokuapp.com/"
+    },
+    {
+        "id": "201420373",
+        "nome": "Gabriel Figueiredo Góes",
+        "url": ""
+    },
+    {
+        "id": "201710376",
+        "nome": "Guilherme Senna Cruz",
+        "url": "https://nodejs-sd-guilhermesenna.herokuapp.com/"
+    },
+    {
+        "id": "201710377",
+        "nome": "Hiago Rios Cordeiro",
+        "url": "https://sd-api-uesc.herokuapp.com/"
+    },
+    {
+        "id": "201810665",
+        "nome": "Jenilson Ramos Santos",
+        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
+    },
+    {
+        "id": "201610327",
+        "nome": "João Pedro De Gois Pinto",
+        "url": "https://sd-joaopedrop-20212.herokuapp.com/"
+    },
+    {
+        "id": "201610337",
+        "nome": "Luís Carlos Santos Câmara",
+        "url": "https://sd-20212-luiscarlos.herokuapp.com/"
+    },
+    {
+        "id": "201620181",
+        "nome": "Matheus Santos Rodrigues",
+        "url": ""
+    },
+    {
+        "id": "201620400",
+        "nome": "Nassim Maron Rihan",
+        "url": "https://sd-nassimrihan-2021-2.herokuapp.com/"
+    },
+    {
+        "id": "201710396",
+        "nome": "Robert Morais Santos Broketa",
+        "url": "https://pratica-sd.herokuapp.com/"
+    },
+    {
+        "id": "201720308",
+        "nome": "Victor Dos Santos Santana",
+        "url": "https://sd-victor-20212.herokuapp.com/"
+    }
+]
+
+let json_info = JSON.stringify(info_default);
+let json_peers = JSON.stringify(peers_default);
+
+// async function resetar() {
+//     // Reseta o conteúdo de info
+//     fs.writeFile('info.json', json_info, function (err) {
+//         if (err) {
+//             throw err;
+//         } else {
+//             // Reseta o conteúdo do peers
+//             fs.writeFile('peers.json', json_peers, function (err) {
+//                 if (err)
+//                     throw err;
+//                 res.send('info e peers resetados com sucesso');
+//             });
+//         }
+//     });
+// }
+
+
+app.get('/reset', (req, res) => {
+    // Reseta o conteúdo de info
+    fs.writeFile('info.json', json_info, function (err) {
+        if (err) {
+            throw err;
+        } else {
+            // Reseta o conteúdo do peers
+            fs.writeFile('peers.json', json_peers, function (err) {
+                if (err)
+                    throw err;
+                res.send('info e peers resetados com sucesso');
+            });
+        }
+    });
+
+});
+
 app.get('/', (req, res) => {
     res.send('Rotas: /clientes, /pag1, /pag2, /pag3, /hello, /resolver, /info, /peers, /peers/ID')
 });
@@ -42,16 +161,6 @@ app.get('/pag3', (req, res) => {
     res.send('Página 3')
 });
 
-
-// {
-//     "server_name": "server",
-//     "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
-//     "descrição": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, etc",
-//     "versao": "0.1",
-//     "Status": "online",
-//     "tipo_de_eleicao_ativa": "ring"
-// }
-
 // [GET] /info
 app.get('/info', (req, res) => {
 
@@ -72,7 +181,7 @@ app.put('/info', (req, res) => {
     let atributos = [
         'server_name',
         'server_endpoint',
-        'descrição',
+        'descricao',
         'versao',
         'status',
         'tipo_de_eleicao_ativa'
@@ -111,7 +220,7 @@ app.put('/info', (req, res) => {
                 let peers_file = JSON.parse(data);
                 check = true;
 
-                // Essas checagens ocorrem porque algumas chaves podem ser passadas vazias, ou alterar apenas parcialmente
+                // Essas checagens ocorrem porque algumas chaves podem ser passadas vazias, nesse caso serve para alterar parcialmente
                 if (req.body.server_name) {
                     peers_file.server_name = req.body.server_name;
                 }
@@ -120,8 +229,8 @@ app.put('/info', (req, res) => {
                     peers_file.server_endpoint = req.body.server_endpoint;
                 }
 
-                if (req.body.descrição) {
-                    peers_file.descrição = req.body.descrição;
+                if (req.body.descricao) {
+                    peers_file.descricao = req.body.descricao;
                 }
 
                 if (req.body.versao) {
@@ -177,6 +286,11 @@ app.post('/peers', (req, res) => {
         'url'
     ];
 
+    console.log(req.body)
+
+
+    // console.log(req.body);
+
     let check = true;
 
     // Tenta ler o arquivo peers.json
@@ -215,6 +329,13 @@ app.post('/peers', (req, res) => {
                         return res.status(400).json({ status: 400, message: `É necessário ter todas as 3 chaves: 'id', 'nome' e 'url'.` });
                     }
                 }
+
+                if (check) {
+                    if (!(typeof req.body.nome === 'string' || req.body.nome instanceof String) || !(typeof req.body.url === 'string' || req.body.url instanceof String)) {
+                        check = false;
+                        return res.status(400).json({ status: 400, message: `ID e/ou nome não é string` });
+                    }
+                }
             }
 
             if (check) {
@@ -226,7 +347,7 @@ app.post('/peers', (req, res) => {
                     else if (peers_file[i].id == req.body.id) {
                         check = false;
                         return res.status(409).json({ status: 409, message: `Já existe esse ID cadastrado.` });
-                    }else if(peers_file[i].nome == req.body.nome){
+                    } else if (peers_file[i].nome == req.body.nome) {
                         check = false;
                         return res.status(409).json({ status: 409, message: `Já existe esse nome cadastrado.` });
                     }
@@ -240,7 +361,8 @@ app.post('/peers', (req, res) => {
                 // Adiciona o novo objeto no conjunto
                 fs.writeFile('peers.json', json, function (err) {
                     if (err) throw err;
-                    return res.send('O peer foi adicionado corretamente!');
+                    // return res.send('O peer foi adicionado corretamente!');
+                    res.send(req.body);
                 });
             }
 
@@ -266,6 +388,8 @@ app.post('/peers', (req, res) => {
 app.get('/peers/:id', (req, res) => {
 
     let id = req.params.id;
+
+    // console.log(id)
 
     // Tenta ler o arquivo peers.json
     fs.readFile('peers.json', function (err, data) {
@@ -295,13 +419,23 @@ app.put('/peers/:id', (req, res) => {
         'url'
     ];
 
+    // resetar()
+
+    let check = true;
+
     let id = req.params.id;
+
+    // console.log(req.body);
+
+    // if (!Number.isInteger(id)) {
+    //     check = false;
+    //     return res.status(404).json({ status: 404, message: `O ID passado não é inteiro.` });
+    // }
 
     // Tenta ler o arquivo peers.json
     fs.readFile('peers.json', function (err, data) {
         if (!err) {           // Se não houver erros...
             let peers_file = JSON.parse(data);
-            let check = true;
 
             // Checagem da requisição antes de tentar editar
             if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
@@ -333,7 +467,9 @@ app.put('/peers/:id', (req, res) => {
 
             // Checa se o nome e o ID solicitado para alteração já não é usado por outro usuário
             for (var i = 0; i < peers_file.length; i++) {
-                if (peers_file[i].id == req.body.id || peers_file[i].nome == req.body.nome) {
+                // console.log(`ID-Parâmetro ${id} / ID-Requisição ${req.body.id} / ID-Usuário ${peers_file[i].id}`);
+                if ((peers_file[i].id == req.body.id || peers_file[i].nome == req.body.nome) && id != req.body.id) {
+
                     check = false;
                     return res.status(409).json({ status: 409, message: `Esse ID ou nome já está sendo usado por outro usuário.` });
                 }
@@ -369,10 +505,12 @@ app.put('/peers/:id', (req, res) => {
                 // Adiciona o novo objeto no conjunto
 
                 var json = JSON.stringify(peers_file);
+                console.log(req.body)
 
                 fs.writeFile('peers.json', json, function (err) {
                     if (err) throw err;
-                    return res.status(200).json({ status: 200, message: `O peer selecionado foi alterado com sucesso!` });
+                    // return res.status(200).json({ status: 200, message: req.body });
+                    res.send(req.body);
                 });
             } else {
                 // Caso não ache um usuário associado ao ID
@@ -397,6 +535,7 @@ app.delete('/peers/:id', (req, res) => {
         if (!err) {           // Se não houver erros...
             let peers = JSON.parse(data);
 
+            // Remoção do peer
             for (var i = 0; i < peers.length; i++) {
                 if (peers[i].id == id) {
                     peers.splice(i, 1);
