@@ -23,4 +23,4 @@
 
 ### Funcionalidades:
 - Permite alterar só o que foi passado (Aonde não há chaves necessárias, como no método PUT)
-- Ao editar um peer, checa se o novo ID/nome já não está sendo usado por outro usuário
+- Ao editar um peer, checa se o novo ID/nome já não está sendo usado por outro usuário (Porém, permite alterar informações UNIQUE se estiver manipulando um objeto que contenha o mesmo ID do passado por requisição)
