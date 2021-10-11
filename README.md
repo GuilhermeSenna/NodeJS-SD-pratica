@@ -10,7 +10,8 @@
 - '/info', com métodos GET e PUT
 - '/peers', com métodos GET e PUT
 - '/peers/:id', com métodos GET, PUT e DELETE
-- '/resolver'. com métodos GET {comentado}  e POST
+- '/resolver', com métodos GET {comentado} e POST
+- '/reset', retorna o conteúdo do peers e info para o padrão
 
 ### Checagens:
 - Checa se o corpo da requisição está vazio
