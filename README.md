@@ -4,7 +4,6 @@
 
 ## Link:  [Repositório oficial](https://github.com/profmathias/cet-100)
 
-#
 ### Rotas presentes:
 - Padrões: ('/', '/hello', '/clientes', '/pag1', '/pag2', '/pag3')
 - '/info', com métodos GET e PUT
