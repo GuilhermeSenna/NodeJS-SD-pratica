@@ -6,7 +6,7 @@
 
 #
 ### Rotas presentes:
-- Padrões: (index{'/'}, /hello, clientes, /pag1, /pag2, /pag3 )
+- Padrões: ('/', '/hello', '/clientes', '/pag1', '/pag2', '/pag3')
 - '/info', com métodos GET e PUT
 - '/peers', com métodos GET e PUT
 - '/peers/:id', com métodos GET, PUT e DELETE
