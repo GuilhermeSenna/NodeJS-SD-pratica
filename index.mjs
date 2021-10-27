@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-
+import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
 
 // File System - Lidar com arquivos
@@ -90,6 +90,10 @@ let peers_default = [
         "url": "https://sd-victor-20212.herokuapp.com/"
     }
 ]
+
+let expiracao = -1;
+let codigo = -1;
+let valor = -1;
 
 let json_info = JSON.stringify(info_default);
 let json_peers = JSON.stringify(peers_default);
@@ -561,6 +565,117 @@ app.delete('/peers/:id', (req, res) => {
         }
     });
 });
+
+// [GET] /recurso
+app.get('/recurso', (req, res) => {
+    let codigo_acesso = req.body.codigo_de_acesso
+
+    if (codigo == codigo_acesso) {
+        if (expiracao != -1) {
+            let data = new Date();
+
+            if (data / 1000 < expiracao / 1000) {  // Menor que 10 segundos
+                res.send({ "valor": valor })
+            } else {
+                return res.status(401).json({ status: 401, message: 'Código expirado.' });
+            }
+        } else {
+            return res.status(401).json({ status: 401, message: 'Expiração inválida, gere um código primeiro.' });
+        }
+
+    } else {
+        return res.status(401).json({ status: 401, message: 'Código inválido.' });
+    }
+});
+
+function retornar_recurso() {
+    codigo = uuidv4();
+    expiracao = new Date();
+    expiracao.setSeconds(expiracao.getSeconds() + 10);
+    valor = 1;
+
+    let json = {
+        "codigo_de_acesso": codigo,
+        "validade": expiracao,
+    };
+
+    return (json);
+}
+
+// [POST] /recurso
+app.post('/recurso', (req, res) => {
+
+    // Primeiro uso
+    if (expiracao == -1) {
+        res.send(retornar_recurso());
+    } else {
+        let data = new Date();
+
+        if (data / 1000 < expiracao / 1000) {  // Menor que 10 segundos
+            return res.status(409).json({ status: 409, message: `Recurso em uso` });
+        } else {
+            res.send(retornar_recurso());
+        }
+    }
+});
+
+// [PUT] /recurso
+app.put('/recurso', (req, res) => {
+    let valor_modificar = req.body.valor;
+    let codigo_acesso = req.body.codigo_de_acesso
+
+    if (codigo == codigo_acesso) {
+        if (expiracao != -1) {
+            let data = new Date();
+
+            if (data / 1000 < expiracao / 1000) {  // Menor que 10 segundos
+
+                valor = valor_modificar;
+
+                let json = {
+                    "codigo_de_acesso": codigo,
+                    "valor": valor
+                }
+
+                res.send(json);
+            } else {
+                return res.status(401).json({ status: 401, message: 'Código expirado.' });
+            }
+        } else {
+            return res.status(401).json({ status: 401, message: 'Expiração inválida, gere um código primeiro.' });
+        }
+
+    } else {
+        return res.status(401).json({ status: 401, message: 'Código inválido.' });
+    }
+});
+
+// [DELETE] /recurso
+app.delete('/recurso', (req, res) => {
+    let codigo_acesso = req.body.codigo_de_acesso
+
+    if (codigo == codigo_acesso) {
+        if (expiracao != -1) {
+            let data = new Date();
+
+            if (data / 1000 < expiracao / 1000) {  // Menor que 10 segundos
+                expiracao = -1;
+                codigo = -1;
+                valor = -1;
+
+                res.sendStatus(200)
+            } else {
+                return res.status(410).json({ status: 410, message: 'Código expirado.' });
+            }
+        } else {
+            return res.status(410).json({ status: 410, message: 'Expiração inválida, gere um código primeiro.' });
+        }
+
+    } else {
+        return res.status(410).json({ status: 410, message: 'Código inválido.' });
+    }
+});
+
 
 app.post('/resolver', (req, res) => {
 
