@@ -2,10 +2,10 @@
     "name": "sd-pratica1",
     "version": "1.0.0",
     "description": "Programa da prática um da disciplina SD",
-    "main": "index.mjs",
+    "main": "index.js",
     "scripts": {
         "test": "karma",
-        "start": "node index.mjs"
+        "start": "node index.js"
     },
     "dependencies": {
         "express": "^4.17.1",

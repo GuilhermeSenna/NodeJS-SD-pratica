@@ -1,9 +1,10 @@
 /*jshint esversion: 6 */
-import { v4 as uuidv4 } from 'uuid';
-import express from 'express';
+const { v4: uuidv4 } = require('uuid');
+const express = require('express');
 
 // File System - Lidar com arquivos
-import fs from 'fs';
+var fs = require('fs');
+// const fsa = require('fs').promises;
 
 const app = express()
 app.use(express.json());
@@ -168,14 +169,19 @@ app.get('/pag3', (req, res) => {
 // [GET] /info
 app.get('/info', (req, res) => {
 
+    console.log(1);
+
     // Tenta ler o arquivo info.json
     fs.readFile('info.json', function (err, data) {
+        console.log(2);
         if (!err) {           // Se não houver erros...
             res.send(data);   // Printa o conteúdo.
         } else {              // Caso haja erros...
             res.send(err);    // Retorna o erro.
         }
     });
+
+    console.log(3);
 });
 
 //[PUT] /info
