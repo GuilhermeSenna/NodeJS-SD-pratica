@@ -5,6 +5,7 @@ const express = require('express');
 // File System - Lidar com arquivos
 var fs = require('fs');
 const fsa = require('fs').promises;
+const axios = require('axios');
 // const fsa = require('fs').promises;
 
 const app = express()
@@ -97,7 +98,7 @@ let ativos = [
     {
         "id": "201720295",
         "nome": "Allana Dos Santos Campos",
-        "url": "https://sd-ascampos-20212.herokuapp.com/"
+        "url": "https://sd-ascampos-20212.herokuapp.come/"
     },
     {
         "id": "201710376",
@@ -110,11 +111,6 @@ let ativos = [
         "url": "https://sd-api-uesc.herokuapp.com/"
     },
     {
-        "id": "201810665",
-        "nome": "Jenilson Ramos Santos",
-        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
-    },
-    {
         "id": "201710396",
         "nome": "Robert Morais Santos Broketa",
         "url": "https://pratica-sd.herokuapp.com/"
@@ -124,7 +120,6 @@ let ativos = [
 let expiracao = -1;
 let codigo = -1;
 let valor = -1;
-let cont = 0;
 let eleicoes_em_andamento = [];
 
 let json_info = JSON.stringify(info_default);
@@ -874,18 +869,22 @@ app.post('/eleicao/:id', (req, res) => {
         }
     }
 
-    check = true;
+    // Tornado falso para checar se acha um ID presente entre os procurados
+    check = false;
 
     // Checa se o nome e o ID solicitado para alteração já não é usado por outro usuário
     for (var i = 0; i < ativos.length; i++) {
         // console.log(`ID-Parâmetro ${id} / ID-Requisição ${req.body.id} / ID-Usuário ${ativos[i].id}`);
 
         // [ADICIONAR] Adicionar checagem se o id_eleicao existe e é ativo
-        if ((ativos[i].id == req.body.coordenador)) {
-
-            check = false;
-            return res.status(409).json({ status: 409, message: `Esse ID ou nome já está sendo usado por outro usuário.` });
+        if ((ativos[i].id == id)) {
+            check = true;
+            break;
         }
+    }
+
+    if (!check) {
+        return res.status(409).json({ status: 409, message: `ID não presente entre os ativos.` });
     }
 
     if (check) {
@@ -915,6 +914,57 @@ app.post('/eleicao/:id', (req, res) => {
             }
         });
     }
+
+});
+
+app.get('/teste', (req, res) => {
+
+    // Lista das infos de todos os participantes ativos
+    lista_de_infos = [];
+
+    // Função que requisita a info dos participantes
+    const get_info = async (ativo) => {
+        // Requisição para a URL do parcipante + a rota desejada (info)
+        const resp = await axios.get(ativo.url + "info");
+
+        // Adiciona o ID do parcipante na lista de infos
+        resp.data.id = ativo.id;
+
+        // Retorna a info + ID
+        return resp.data;
+    };
+
+    // Função para capturar todas as infos
+    const infos = async () => {
+
+        // Espera acabar todas as promises
+        Promise.all(
+
+            // Map de todos os peers ativos atualmente
+            ativos.map(async (ativo) => {
+                // Retorno da função aonde é feito a requisição das infos
+                const info_ = await get_info(ativo);
+
+                // Adiciona a info obtida na lista de infos
+                lista_de_infos.push(info_);
+            })
+        )
+            // Caso não encontre erros, retorna a lista de infos +ID
+            .then(function () { res.send(lista_de_infos); })
+
+            // Caso encontre erros, motra a URL aonde ocorreu o erro.
+            .catch(function (err) {
+                if (err.hostname) {
+                    res.status(400).json({ status: 400, message: `Erro ao tentar obter o info de: ${err.hostname}` });
+                } else {
+                    res.status(400).json({ status: 400, message: `Erro desconhecido ao tentar obter o` });
+                }
+
+            });
+    };
+
+    // Chama a função das infos
+    infos();
 
 });
 
