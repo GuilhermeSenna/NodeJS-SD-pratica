@@ -11,6 +11,9 @@
 - '/peers/:id', com métodos GET, PUT e DELETE
 - '/recurso', com métodos GET, POST, PUT e DELETE
 - '/resolver', com métodos GET {comentado} e POST
+- '/coordenador', com método GET
+- '/eleicao', com método GET e POST
+- '/eleicao/:id', com método POST
 - '/reset', retorna o conteúdo do peers e info para o padrão
 
 ### Checagens:
