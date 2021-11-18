@@ -6,6 +6,7 @@ const express = require('express');
 var fs = require('fs');
 const fsa = require('fs').promises;
 const axios = require('axios');
+const { application } = require('express');
 // const fsa = require('fs').promises;
 
 const app = express()
@@ -885,9 +886,7 @@ app.post('/eleicao/:id', (req, res) => {
 
     if (!check) {
         return res.status(409).json({ status: 409, message: `ID não presente entre os ativos.` });
-    }
-
-    if (check) {
+    } else {
         fs.readFile('info.json', function (err, data) {
 
             if (!err) {           // Se não houver erros...
@@ -966,6 +965,67 @@ app.get('/teste', (req, res) => {
     // Chama a função das infos
     infos();
 
+});
+
+// Testando um axios para o localhost
+app.get('/auto', (req, res) => {
+    const teste = async () => {
+        const resp = await axios.get('http://localhost:8000/info');
+        console.log(resp.data)
+    }
+
+    teste();
+
+});
+
+// Verificações para as chamadas consecutivas
+
+function horario_atual() {
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    return (horario = hour + ":" + min + ":" + sec);
+}
+
+app.get('/verificar', (req, res) => {
+    const teste = async () => {
+        function sleep(ms) {
+            return new Promise((resolve) => {
+                setTimeout(resolve, ms);
+            });
+        }
+
+        while (true) {
+
+            console.log(`[${horario_atual()}] Verificando coordenador, Aguarde 2 segundos...`);
+            await sleep(2000);
+
+            // if coordenador == offline
+            if (true) {
+                let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
+                console.log(`[${horario_atual()}] O coordenador parece não estar ativo, aguardando ${timer_gerado} segundos para testar novamente!`);
+
+                // Checar de novo se o coordenado está ativo
+                await sleep(timer_gerado * 1000);
+
+                // if coordenador == offline
+                if (true) {
+                    console.log(`[${horario_atual()}] O coordenador está offline, iniciando uma nova eleição!`)
+                }
+            }
+        }
+        res.send("teste")
+    }
+
+    teste();
 });
 
 app.post('/resolver', (req, res) => {
