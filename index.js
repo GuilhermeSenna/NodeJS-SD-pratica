@@ -4,6 +4,7 @@ const express = require('express');
 
 // File System - Lidar com arquivos
 var fs = require('fs');
+const fsa = require('fs').promises;
 // const fsa = require('fs').promises;
 
 const app = express()
@@ -13,11 +14,11 @@ app.use(express.urlencoded({ extended: true }));
 let info_default = {
     "server_name": "server",
     "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
-    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, etc",
+    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, etc",
     "versao": "0.1",
     "status": "online",
     "tipo_de_eleicao_ativa": "ring"
-}
+};
 
 let peers_default = [
     {
@@ -90,11 +91,41 @@ let peers_default = [
         "nome": "Victor Dos Santos Santana",
         "url": "https://sd-victor-20212.herokuapp.com/"
     }
+];
+
+let ativos = [
+    {
+        "id": "201720295",
+        "nome": "Allana Dos Santos Campos",
+        "url": "https://sd-ascampos-20212.herokuapp.com/"
+    },
+    {
+        "id": "201710376",
+        "nome": "Guilherme Senna Cruz",
+        "url": "https://nodejs-sd-guilhermesenna.herokuapp.com/"
+    },
+    {
+        "id": "201710377",
+        "nome": "Hiago Rios Cordeiro",
+        "url": "https://sd-api-uesc.herokuapp.com/"
+    },
+    {
+        "id": "201810665",
+        "nome": "Jenilson Ramos Santos",
+        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
+    },
+    {
+        "id": "201710396",
+        "nome": "Robert Morais Santos Broketa",
+        "url": "https://pratica-sd.herokuapp.com/"
+    }
 ]
 
 let expiracao = -1;
 let codigo = -1;
 let valor = -1;
+let cont = 0;
+let eleicoes_em_andamento = [];
 
 let json_info = JSON.stringify(info_default);
 let json_peers = JSON.stringify(peers_default);
@@ -168,20 +199,15 @@ app.get('/pag3', (req, res) => {
 
 // [GET] /info
 app.get('/info', (req, res) => {
-
-    console.log(1);
-
     // Tenta ler o arquivo info.json
     fs.readFile('info.json', function (err, data) {
-        console.log(2);
+
         if (!err) {           // Se não houver erros...
             res.send(data);   // Printa o conteúdo.
         } else {              // Caso haja erros...
             res.send(err);    // Retorna o erro.
         }
     });
-
-    console.log(3);
 });
 
 //[PUT] /info
@@ -199,7 +225,7 @@ app.put('/info', (req, res) => {
 
     let check = true;
 
-    // Tenta ler o arquivo message.json
+    // Tenta ler o arquivo req.body
     if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
         return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
     } else {
@@ -310,21 +336,21 @@ app.post('/peers', (req, res) => {
 
             // Tenta ler o arquivo message.json
             if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
-                check = false
+                check = false;
                 return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
             } else {
                 Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
                     if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
-                        check = false
+                        check = false;
                         return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
                     } else if (!key) {
-                        check = false
+                        check = false;
                         return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
                     } else if (!req.body[key]) {
-                        check = false
+                        check = false;
                         return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
                     } else if (!peers.includes(key)) {          // Checa se o nome da chave é válido
-                        check = false
+                        check = false;
                         return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
                     }
                 });
@@ -335,7 +361,7 @@ app.post('/peers', (req, res) => {
 
                     // Checa se há as 3 chaves: id, nome e url.
                     if (!peers.every(element => conteudo.includes(element))) {
-                        check = false
+                        check = false;
                         return res.status(400).json({ status: 400, message: `É necessário ter todas as 3 chaves: 'id', 'nome' e 'url'.` });
                     }
                 }
@@ -669,7 +695,7 @@ app.delete('/recurso', (req, res) => {
                 codigo = -1;
                 valor = -1;
 
-                res.sendStatus(200)
+                res.sendStatus(200);
             } else {
                 return res.status(410).json({ status: 410, message: 'Código expirado.' });
             }
@@ -682,6 +708,215 @@ app.delete('/recurso', (req, res) => {
     }
 });
 
+
+app.get('/coordenador', (req, res) => {
+    let json = {
+        "coordenador": "false",
+        "coordenador_atual": "id_do_coordenador"
+    };
+
+    res.send(json);
+});
+
+// Checar a cada 2 segundos se o coordenador está ativo
+
+// Checar se o coordenador está online pelo info
+
+// Caso não esteja esperar um tempo entre 5 e 10 segundos, tentar de novo
+// Caso ainda sim não esteja, iniciar a eleição
+
+app.get('/eleicao', (req, res) => {
+
+    fs.readFile('info.json', function (err, data) {
+
+        if (!err) {           // Se não houver erros...
+
+            var temp = JSON.parse(data.toString());
+
+            let json = {
+                "tipo_de_eleicao_ativa": temp.tipo_de_eleicao_ativa,
+                "eleicoes_em_andamento": eleicoes_em_andamento
+            };
+
+            res.send(json);
+        } else {              // Caso haja erros...
+            res.send(err);    // Retorna o erro.
+        }
+    });
+
+});
+
+app.post('/eleicao', (req, res) => {
+
+    let atributos = [
+        'id',
+        'dados'
+    ];
+
+    let check = true;
+
+    // Tenta ler o arquivo req.body
+    if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
+        return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
+    } else {
+        Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
+            if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
+                check = false;
+                return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
+            } else if (!key) {
+                check = false;
+                return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
+            } else if (!req.body[key]) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
+            } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
+                check = false;
+                return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
+            }
+        });
+
+        // Checa se todas as chaves necessárias estão inclusas
+        if (check) {
+            let conteudo = JSON.stringify(req.body);
+
+            // Checa se há as 2 chaves: id e dados.
+            if (!atributos.every(element => conteudo.includes(element))) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `É necessário ter todas as 2 chaves: 'id' e 'dados'.` });
+            }
+        }
+
+        if (check) {
+            if (!(typeof req.body.id === 'string' || req.body.id instanceof String)) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `id não é string` });
+            }
+        }
+    }
+
+    if (check) {
+        fs.readFile('info.json', function (err, data) {
+
+            if (!err) {           // Se não houver erros...
+
+                var temp = JSON.parse(data.toString());
+
+                let tipo_eleicao = temp.tipo_de_eleicao_ativa;
+
+
+                // Lembrar também de consultar os endpoints dos outros
+                if (tipo_eleicao == "valentao") {
+                    // Algoritmo do valentão
+                } else if (tipo_eleicao == "anel") {
+                    // Algoritmo do valentão
+                } else {
+                    return res.status(404).json({
+                        status: 404, message: `Algoritmo de eleição não identificado: '${tipo_eleicao}' `
+                    });
+                }
+
+                res.send(json);
+            } else {              // Caso haja erros...
+                res.send(err);    // Retorna o erro.
+            }
+        });
+    }
+
+});
+
+app.post('/eleicao/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    let atributos = [
+        'coordenador',
+        'id_eleicao'
+    ];
+
+    let check = true;
+
+    // Tenta ler o arquivo req.body
+    if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
+        return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
+    } else {
+        Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
+            if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
+                check = false;
+                return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
+            } else if (!key) {
+                check = false;
+                return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
+            } else if (!req.body[key]) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
+            } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
+                check = false;
+                return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
+            }
+        });
+
+        // Checa se todas as chaves necessárias estão inclusas
+        if (check) {
+            let conteudo = JSON.stringify(req.body);
+
+            // Checa se há as 2 chaves: id e dados.
+            if (!atributos.every(element => conteudo.includes(element))) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `É necessário ter todas as 2 chaves: 'coordenador' e 'id_eleicao'.` });
+            }
+        }
+
+        if (check) {
+            if (!(typeof req.body.id_eleicao === 'string' || req.body.id_eleicao instanceof String)) {
+                check = false;
+                return res.status(400).json({ status: 400, message: `id_eleicao não é string` });
+            }
+        }
+    }
+
+    check = true;
+
+    // Checa se o nome e o ID solicitado para alteração já não é usado por outro usuário
+    for (var i = 0; i < ativos.length; i++) {
+        // console.log(`ID-Parâmetro ${id} / ID-Requisição ${req.body.id} / ID-Usuário ${ativos[i].id}`);
+
+        // [ADICIONAR] Adicionar checagem se o id_eleicao existe e é ativo
+        if ((ativos[i].id == req.body.coordenador)) {
+
+            check = false;
+            return res.status(409).json({ status: 409, message: `Esse ID ou nome já está sendo usado por outro usuário.` });
+        }
+    }
+
+    if (check) {
+        fs.readFile('info.json', function (err, data) {
+
+            if (!err) {           // Se não houver erros...
+
+                var temp = JSON.parse(data.toString());
+
+                let tipo_eleicao = temp.tipo_de_eleicao_ativa;
+
+
+                // Lembrar também de consultar os endpoints dos outros
+                if (tipo_eleicao == "valentao") {
+                    // Algoritmo do valentão
+                } else if (tipo_eleicao == "anel") {
+                    // Algoritmo do valentão
+                } else {
+                    return res.status(404).json({
+                        status: 404, message: `Algoritmo de eleição não identificado: '${tipo_eleicao}' `
+                    });
+                }
+
+                res.send(json);
+            } else {              // Caso haja erros...
+                res.send(err);    // Retorna o erro.
+            }
+        });
+    }
+
+});
 
 app.post('/resolver', (req, res) => {
 
@@ -732,4 +967,4 @@ app.post('/resolver', (req, res) => {
 
 app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
-})
+});
