@@ -26,6 +26,8 @@
 - Checa se está buscando um usuário por ID inexistente
 
 ### Funcionalidades:
+- Implementação de múltiplas requisições externas e outros métodos assíncronos.
+- Armazenamento de logs dos procedimentos realizados durante uma eleição. ([Logs online](https://sd-log-server.herokuapp.com/log) {não criado por mim}) 
 - Permite alterar só o que foi passado (Aonde não há chaves necessárias, como no método PUT)
 - Ao editar um peer, checa se o novo ID/nome já não está sendo usado por outro usuário (Porém, permite alterar informações UNIQUE se estiver manipulando um objeto que contenha o mesmo ID do passado por requisição)
 - Códigos de resposta HTTP usados:
