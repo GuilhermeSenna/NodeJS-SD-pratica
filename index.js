@@ -996,37 +996,68 @@ function horario_atual() {
 }
 
 app.get('/verificar', (req, res) => {
-    const teste = async () => {
-        function sleep(ms) {
-            return new Promise((resolve) => {
-                setTimeout(resolve, ms);
-            });
-        }
+    // const teste = async () => {
+    //     function sleep(ms) {
+    //         return new Promise((resolve) => {
+    //             setTimeout(resolve, ms);
+    //         });
+    //     }
 
-        while (true) {
+    //     while (true) {
 
-            console.log(`[${horario_atual()}] Verificando coordenador, Aguarde 2 segundos...`);
-            await sleep(2000);
+    //         console.log(`[${horario_atual()}] Verificando coordenador, Aguarde 2 segundos...`);
+    //         await sleep(2000);
+
+    //         // if coordenador == offline
+    //         if (true) {
+    //             let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
+    //             console.log(`[${horario_atual()}] O coordenador parece não estar ativo, aguardando ${timer_gerado} segundos para testar novamente!`);
+
+    //             // Checar de novo se o coordenado está ativo
+    //             await sleep(timer_gerado * 1000);
+
+    //             // if coordenador == offline
+    //             if (true) {
+    //                 console.log(`[${horario_atual()}] O coordenador está offline, iniciando uma nova eleição!`)
+    //             }
+    //         }
+    //     }
+    //     res.send("teste")
+    // }
+
+    // teste();
+});
+
+// Verificacao contínua se o coordenador está online
+const verificacao = async () => {
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    while (true) {
+
+        console.log(`[${horario_atual()}] (1ª verificação coordenador) aguardando 2 segundos...`);
+        await sleep(2000);
+
+        // if coordenador == offline
+        if (true) {
+            let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
+            console.log(`[${horario_atual()}] (2ª verificação coordenador) aguardando ${timer_gerado} segundos para testar novamente!`);
+
+            // Checar de novo se o coordenado está ativo
+            await sleep(timer_gerado * 1000);
 
             // if coordenador == offline
             if (true) {
-                let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
-                console.log(`[${horario_atual()}] O coordenador parece não estar ativo, aguardando ${timer_gerado} segundos para testar novamente!`);
-
-                // Checar de novo se o coordenado está ativo
-                await sleep(timer_gerado * 1000);
-
-                // if coordenador == offline
-                if (true) {
-                    console.log(`[${horario_atual()}] O coordenador está offline, iniciando uma nova eleição!`)
-                }
+                console.log(`[${horario_atual()}] (Coordenador OFFLINE) iniciando uma nova eleição!`)
             }
         }
-        res.send("teste")
     }
+}
 
-    teste();
-});
+verificacao();
 
 app.post('/resolver', (req, res) => {
 
