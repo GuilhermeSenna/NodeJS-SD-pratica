@@ -4,10 +4,8 @@ const express = require('express');
 
 // File System - Lidar com arquivos
 var fs = require('fs');
-const fsa = require('fs').promises;
 const axios = require('axios');
-const { application } = require('express');
-// const fsa = require('fs').promises;
+// const { application } = require('express');
 
 const app = express()
 app.use(express.json());
@@ -19,7 +17,7 @@ let info_default = {
     "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, etc",
     "versao": "0.1",
     "status": "online",
-    "tipo_de_eleicao_ativa": "ring"
+    "tipo_de_eleicao_ativa": "valentao"
 };
 
 let peers_default = [
@@ -99,7 +97,7 @@ let ativos = [
     {
         "id": "201720295",
         "nome": "Allana Dos Santos Campos",
-        "url": "https://sd-ascampos-20212.herokuapp.come/"
+        "url": "https://sd-ascampos-20212.herokuapp.com/"
     },
     {
         "id": "201710376",
@@ -708,7 +706,7 @@ app.delete('/recurso', (req, res) => {
 app.get('/coordenador', (req, res) => {
     let json = {
         "coordenador": "false",
-        "coordenador_atual": "id_do_coordenador"
+        "coordenador_atual": 0
     };
 
     res.send(json);
@@ -799,13 +797,18 @@ app.post('/eleicao', (req, res) => {
 
                 let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
-
                 // Lembrar também de consultar os endpoints dos outros
                 if (tipo_eleicao == "valentao") {
-                    // Algoritmo do valentão
+                    return res.status(200).json({
+                        status: 200, message: `Valentão escolhido`
+                    });
                 } else if (tipo_eleicao == "anel") {
                     // Algoritmo do valentão
                 } else {
+
+                    enviar_log("Critical", "Tipo de eleição inválido", "Tipo de eleição inserido incorretamente na /info. Os tipos aceitos e reconhecidos são: 'valentao' e 'anel'. Tudo minúsculo e sem acentos.");
+
+
                     return res.status(404).json({
                         status: 404, message: `Algoritmo de eleição não identificado: '${tipo_eleicao}' `
                     });
@@ -978,86 +981,6 @@ app.get('/auto', (req, res) => {
 
 });
 
-// Verificações para as chamadas consecutivas
-
-function horario_atual() {
-    var date = new Date();
-
-    var hour = date.getHours();
-    hour = (hour < 10 ? "0" : "") + hour;
-
-    var min = date.getMinutes();
-    min = (min < 10 ? "0" : "") + min;
-
-    var sec = date.getSeconds();
-    sec = (sec < 10 ? "0" : "") + sec;
-
-    return (horario = hour + ":" + min + ":" + sec);
-}
-
-app.get('/verificar', (req, res) => {
-    // const teste = async () => {
-    //     function sleep(ms) {
-    //         return new Promise((resolve) => {
-    //             setTimeout(resolve, ms);
-    //         });
-    //     }
-
-    //     while (true) {
-
-    //         console.log(`[${horario_atual()}] Verificando coordenador, Aguarde 2 segundos...`);
-    //         await sleep(2000);
-
-    //         // if coordenador == offline
-    //         if (true) {
-    //             let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
-    //             console.log(`[${horario_atual()}] O coordenador parece não estar ativo, aguardando ${timer_gerado} segundos para testar novamente!`);
-
-    //             // Checar de novo se o coordenado está ativo
-    //             await sleep(timer_gerado * 1000);
-
-    //             // if coordenador == offline
-    //             if (true) {
-    //                 console.log(`[${horario_atual()}] O coordenador está offline, iniciando uma nova eleição!`)
-    //             }
-    //         }
-    //     }
-    //     res.send("teste")
-    // }
-
-    // teste();
-});
-
-// Verificacao contínua se o coordenador está online
-const verificacao = async () => {
-    function sleep(ms) {
-        return new Promise((resolve) => {
-            setTimeout(resolve, ms);
-        });
-    }
-
-    while (true) {
-
-        console.log(`[${horario_atual()}] (1ª verificação coordenador) aguardando 2 segundos...`);
-        await sleep(2000);
-
-        // if coordenador == offline
-        if (true) {
-            let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
-            console.log(`[${horario_atual()}] (2ª verificação coordenador) aguardando ${timer_gerado} segundos para testar novamente!`);
-
-            // Checar de novo se o coordenado está ativo
-            await sleep(timer_gerado * 1000);
-
-            // if coordenador == offline
-            if (true) {
-                console.log(`[${horario_atual()}] (Coordenador OFFLINE) iniciando uma nova eleição!`)
-            }
-        }
-    }
-}
-
-verificacao();
 
 app.post('/resolver', (req, res) => {
 
@@ -1109,3 +1032,107 @@ app.post('/resolver', (req, res) => {
 app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
+
+function enviar_log(severidade, resumo, comentario) {
+    let mensagem_log =
+    {
+        "from": "nodejs-sd-guilhermesenna.herokuapp",
+        "severity": severidade,
+        "comment": resumo,
+        "body": comentario
+    }
+
+    axios.post('https://sd-log-server.herokuapp.com/log', mensagem_log);
+
+}
+
+// Verificações para as chamadas consecutivas
+
+function horario_atual() {
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    return (horario = hour + ":" + min + ":" + sec);
+}
+
+// Verificacao contínua se o coordenador está online
+const verificacao = async () => {
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    while (true) {
+
+        // let mensagem_log =
+        // {
+        //     "from": "nodejs-sd-guilhermesenna.herokuapp",
+        //     "severity": "Success",
+        //     "comment": "1ª verificação (2 segundos)",
+        //     "body": "Realizando 1ª verificação para saber se o coordenador está ativo."
+        // }
+
+        // axios.post('https://sd-log-server.herokuapp.com/log', mensagem_log);
+
+
+        console.log(`[${horario_atual()}] (1ª verificação coordenador) aguardando 2 segundos...`);
+        await sleep(2000);
+
+        // if coordenador == offline
+        if (true) {
+            let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
+            console.log(`[${horario_atual()}] (2ª verificação coordenador) aguardando ${timer_gerado} segundos para testar novamente!`);
+
+            // let mensagem_log =
+            // {
+            //     "from": "nodejs-sd-guilhermesenna.herokuapp",
+            //     "severity": "Success",
+            //     "comment": `2ª verificação (${timer_gerado} segundos)`,
+            //     "body": "Realizando 2ª verificação para confirmar se o coordenador está ativo."
+            // }
+
+            // axios.post('https://sd-log-server.herokuapp.com/log', mensagem_log);
+
+            // Checar de novo se o coordenado está ativo
+            await sleep(timer_gerado * 1000);
+
+            // if coordenador == offline
+            if (true) {
+
+                fs.readFile('info.json', function (err, data) {
+
+                    try {
+                        let temp = JSON.parse(data.toString());
+                        var tipo_eleicao = temp.tipo_de_eleicao_ativa;
+                    } catch (e) {
+                        // Esse erro provavelmente é com o arquivo
+                        // Será informado no Log.
+                    }
+
+
+                    if (!err) {           // Se não houver erros...
+                        if (tipo_eleicao != 'valentao' && tipo_eleicao != 'anel') {
+                            enviar_log("Error", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador X foi confirmado offline, porém o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
+                        } else {
+                            enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador X foi confirmado offline, a eleição correrá pelo algoritmo do ${tipo_eleicao}.`);
+                        }
+                    } else {              // Caso haja erros...
+                        enviar_log("Error", `Coordenador OFFLINE - Info indisponível`, `O coordenador X foi confirmado offline, porém houve um erro ao tentar ler o arquivo com o info. Verifique o /info e/ou me contate. A eleição não poderá ser iniciada até que se resolva esse erro.`);
+                    }
+                });
+                console.log(`[${horario_atual()}] (Coordenador OFFLINE) iniciando uma nova eleição!`);
+            }
+        }
+    }
+}
+
+verificacao();
