@@ -16,7 +16,7 @@ let peers_default = [
     {
         "id": "201512136",
         "nome": "Annya Rita De Souza Ourives",
-        "url": "https://sd-annyaourives-20212.herokuapp.com/hello"
+        "url": "https://sd-annyaourives-20212.herokuapp.com/"
     },
     {
         "id": "201512137",

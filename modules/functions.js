@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { v4: uuidv4 } = require('uuid');
 
 // Checagens básicas no corpo da requisição
 function checagens_iniciais(atributos, body) {
@@ -32,10 +33,10 @@ function checagens_iniciais(atributos, body) {
 }
 
 function retornar_recurso() {
-    codigo = uuidv4();
-    expiracao = new Date();
-    expiracao.setSeconds(expiracao.getSeconds() + 10);
-    valor = 1;
+    let codigo = uuidv4();
+    let expiracao = new Date();
+
+    expiracao = (expiracao.setSeconds(expiracao.getSeconds() + 10));
 
     let json = {
         "codigo_de_acesso": codigo,

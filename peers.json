@@ -7,7 +7,7 @@
     {
         "id": "201512136",
         "nome": "Annya Rita De Souza Ourives",
-        "url": "https://sd-annyaourives-20212.herokuapp.com/hello"
+        "url": "https://sd-annyaourives-20212.herokuapp.com/"
     },
     {
         "id": "201512137",
@@ -23,6 +23,11 @@
         "id": "201420373",
         "nome": "Gabriel Figueiredo Góes",
         "url": ""
+    },
+    {
+        "id": "201710376",
+        "nome": "Guilherme Senna Cruz",
+        "url": "https://nodejs-sd-guilhermesenna.herokuapp.com/"
     },
     {
         "id": "201710377",
@@ -63,15 +68,5 @@
         "id": "201720308",
         "nome": "Victor Dos Santos Santana",
         "url": "https://sd-victor-20212.herokuapp.com/"
-    },
-    {
-        "id": "201710376",
-        "nome": "Guilherme Senna Cruz",
-        "url": "https://nodejs-sd-guilhermesenna.herokuapp.com/"
-    },
-    {
-        "id": "adadw",
-        "nome": "asda",
-        "url": "awdawd"
     }
 ]

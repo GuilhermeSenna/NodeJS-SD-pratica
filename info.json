@@ -1,7 +1,7 @@
 {
-    "server_name": "Server",
+    "server_name": "server",
     "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
-    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, etc",
+    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, eleicao, etc",
     "versao": "0.1",
     "status": "online",
     "tipo_de_eleicao_ativa": "valentao"
