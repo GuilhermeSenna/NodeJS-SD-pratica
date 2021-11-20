@@ -15,6 +15,11 @@
     "devDependencies": {
         "karma": "^6.3.4"
     },
+    "nodemonConfig": {
+        "ignore": [
+            "*.json"
+        ]
+    },
     "author": "Guilherme Senna",
     "license": "MIT"
 }

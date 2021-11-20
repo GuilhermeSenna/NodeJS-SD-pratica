@@ -127,8 +127,8 @@ let codigo = -1;
 let valor = -1;
 let eleicoes_em_andamento = [];
 
-let json_info = JSON.stringify(info_default);
-let json_peers = JSON.stringify(peers_default);
+let json_info = JSON.stringify(info_default, null, 4);
+let json_peers = JSON.stringify(peers_default, null, 4);
 
 
 app.get('/reset', (req, res) => {
@@ -194,6 +194,38 @@ app.get('/info', (req, res) => {
     });
 });
 
+
+// Checagens básicas no corpo da requisição
+function checagens_iniciais(atributos, body) {
+
+    let check = true;
+    let mensagem = '';
+
+    // Tenta ler o arquivo req.body
+    if (Object.values(body).length === 0) {          // Checa se o JSON está vazio
+        check = false;
+        mensagem = 'O corpo da requisição está vazio';
+    } else {
+        Object.keys(body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
+            if (!key && !body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
+                check = false;
+                mensagem = 'Há uma chave e valor vazios.';
+            } else if (!key) {
+                check = false;
+                mensagem = 'Há uma chave vazia';
+            } else if (!body[key]) {
+                check = false;
+                mensagem = `Chave '${key}' com valor vazio.`;
+            } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
+                check = false;
+                mensagem = `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.`;
+            }
+        })
+    }
+
+    return ({ check: check, mensagem: mensagem });
+}
+
 //[PUT] /info
 app.put('/info', (req, res) => {
 
@@ -207,32 +239,14 @@ app.put('/info', (req, res) => {
         'tipo_de_eleicao_ativa'
     ]
 
-    let check = true;
+    let { check, mensagem } = checagens_iniciais(atributos, req.body);
 
-    // Tenta ler o arquivo req.body
-    if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
-        return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
-    } else {
-        Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
-            if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
-                check = false;
-                return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
-            } else if (!key) {
-                check = false;
-                return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
-            } else if (!req.body[key]) {
-                check = false;
-                return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
-            } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
-                check = false;
-                return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
-            }
-        })
+    if (!check) {
+        return res.status(400).json({ status: 400, message: mensagem });
     }
 
     if (check) {
         // Faz o parser correto para JSON, senão o arquivo é escrito como: '[object object]'
-        let json = JSON.stringify(req.body);
 
         // Tenta ler o arquivo info.json
         fs.readFile('info.json', function (err, data) {
@@ -266,7 +280,7 @@ app.put('/info', (req, res) => {
                 }
 
                 if (check) {
-                    var json = JSON.stringify(peers_file);
+                    var json = JSON.stringify(peers_file, null, 4);
                     // Atualiza o conteúdo do info.json
                     fs.writeFile('info.json', json, function (err) {
                         if (err) throw err;
@@ -306,55 +320,32 @@ app.post('/peers', (req, res) => {
         'url'
     ];
 
-    console.log(req.body)
-
-
-    // console.log(req.body);
-
-    let check = true;
-
     // Tenta ler o arquivo peers.json
     fs.readFile('peers.json', function (err, data) {
         if (!err) {    // Se não houver erros...
             let peers_file = JSON.parse(data);
 
-            // Tenta ler o arquivo message.json
-            if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
-                check = false;
-                return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
-            } else {
-                Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
-                    if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
-                        check = false;
-                        return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
-                    } else if (!key) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
-                    } else if (!req.body[key]) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
-                    } else if (!peers.includes(key)) {          // Checa se o nome da chave é válido
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
-                    }
-                });
+            let { check, mensagem } = checagens_iniciais(peers, req.body);
 
-                // Checa se todas as chaves necessárias estão inclusas
-                if (check) {
-                    let conteudo = JSON.stringify(req.body);
+            if (!check) {
+                return res.status(400).json({ status: 400, message: mensagem });
+            }
 
-                    // Checa se há as 3 chaves: id, nome e url.
-                    if (!peers.every(element => conteudo.includes(element))) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `É necessário ter todas as 3 chaves: 'id', 'nome' e 'url'.` });
-                    }
+            // Checa se todas as chaves necessárias estão inclusas
+            if (check) {
+                let conteudo = JSON.stringify(req.body);
+
+                // Checa se há as 3 chaves: id, nome e url.
+                if (!peers.every(element => conteudo.includes(element))) {
+                    check = false;
+                    return res.status(400).json({ status: 400, message: `É necessário ter todas as 3 chaves: 'id', 'nome' e 'url'.` });
                 }
+            }
 
-                if (check) {
-                    if (!(typeof req.body.nome === 'string' || req.body.nome instanceof String) || !(typeof req.body.url === 'string' || req.body.url instanceof String)) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `ID e/ou nome não é string` });
-                    }
+            if (check) {
+                if (!(typeof req.body.nome === 'string' || req.body.nome instanceof String) || !(typeof req.body.url === 'string' || req.body.url instanceof String)) {
+                    check = false;
+                    return res.status(400).json({ status: 400, message: `ID e/ou nome não é string` });
                 }
             }
 
@@ -376,7 +367,7 @@ app.post('/peers', (req, res) => {
 
             if (check) {
                 peers_file.push(req.body);
-                let json = JSON.stringify(peers_file);
+                let json = JSON.stringify(peers_file, null, 4);
 
                 // Adiciona o novo objeto no conjunto
                 fs.writeFile('peers.json', json, function (err) {
@@ -391,16 +382,6 @@ app.post('/peers', (req, res) => {
             return res.send(err);    // Retorna o erro.
         }
     });
-
-
-    // Faz o parser correto para JSON, senão o arquivo é escrito como: '[object object]'
-    // let json = JSON.stringify(req.body);
-
-    // // Atualiza o conteúdo do info.json
-    // fs.writeFile('peers.json', json, function (err) {
-    //     if (err) throw err;
-    //     res.send('O conteúdo foi atualizado com sucesso!');
-    // });
 });
 
 
@@ -408,8 +389,6 @@ app.post('/peers', (req, res) => {
 app.get('/peers/:id', (req, res) => {
 
     let id = req.params.id;
-
-    // console.log(id)
 
     // Tenta ler o arquivo peers.json
     fs.readFile('peers.json', function (err, data) {
@@ -441,45 +420,17 @@ app.put('/peers/:id', (req, res) => {
 
     // resetar()
 
-    let check = true;
-
     let id = req.params.id;
-
-    // console.log(req.body);
-
-    // if (!Number.isInteger(id)) {
-    //     check = false;
-    //     return res.status(404).json({ status: 404, message: `O ID passado não é inteiro.` });
-    // }
 
     // Tenta ler o arquivo peers.json
     fs.readFile('peers.json', function (err, data) {
         if (!err) {           // Se não houver erros...
             let peers_file = JSON.parse(data);
 
-            // Checagem da requisição antes de tentar editar
-            if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
-                check = false;
-                return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
-            } else {
-                Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
-                    if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
-                        check = false;
-                        return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
-                    } else if (!key) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
-                    } else if (!req.body[key]) {
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
-                    } else if (!peers.includes(key)) {          // Checa se o nome da chave é válido
-                        check = false;
-                        return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
-                    }
-                });
-                if (!check) {
-                    return false;
-                }
+            let { check, mensagem } = checagens_iniciais(peers, req.body);
+
+            if (!check) {
+                return res.status(400).json({ status: 400, message: mensagem });
             }
 
             // Checar se o ID solicitado na requisição é usado por outro usuário (evitar duplicidade)
@@ -523,9 +474,7 @@ app.put('/peers/:id', (req, res) => {
 
             if (check) {
                 // Adiciona o novo objeto no conjunto
-
-                var json = JSON.stringify(peers_file);
-                console.log(req.body)
+                var json = JSON.stringify(peers_file, null, 4);
 
                 fs.writeFile('peers.json', json, function (err) {
                     if (err) throw err;
@@ -565,7 +514,7 @@ app.delete('/peers/:id', (req, res) => {
             }
 
             if (check) {
-                var json = JSON.stringify(peers);
+                var json = JSON.stringify(peers, null, 4);
                 fs.writeFile('peers.json', json, function (err) {
                     if (err) throw err;
                     return res.status(200).json({ status: 200, message: `O peer selecionado foi removido com sucesso!` });
@@ -584,7 +533,7 @@ app.delete('/peers/:id', (req, res) => {
 
 // [GET] /recurso
 app.get('/recurso', (req, res) => {
-    let codigo_acesso = req.body.codigo_de_acesso
+    let codigo_acesso = req.body.codigo_de_acesso;
 
     if (codigo == codigo_acesso) {
         if (expiracao != -1) {
@@ -701,13 +650,6 @@ app.get('/coordenador', (req, res) => {
 
     res.send(json);
 });
-
-// Checar a cada 2 segundos se o coordenador está ativo
-
-// Checar se o coordenador está online pelo info
-
-// Caso não esteja esperar um tempo entre 5 e 10 segundos, tentar de novo
-// Caso ainda sim não esteja, iniciar a eleição
 
 app.get('/eleicao', (req, res) => {
 
@@ -892,44 +834,27 @@ app.post('/eleicao/:id', (req, res) => {
         'id_eleicao'
     ];
 
-    let check = true;
+    let { check, mensagem } = checagens_iniciais(atributos, req.body);
 
-    // Tenta ler o arquivo req.body
-    if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
-        return res.status(400).json({ status: 400, message: 'O corpo da requisição está vazio' });
-    } else {
-        Object.keys(req.body).some(function (key) {      // Similar ao Foreach, mas esse permite retorno.
-            if (!key && !req.body[key]) {                // O conteúdo da mensagem torna auto-explicativo as comparações.
-                check = false;
-                return res.status(400).json({ status: 400, message: 'Há uma chave e valor vazios.' });
-            } else if (!key) {
-                check = false;
-                return res.status(400).json({ status: 400, message: 'Há uma chave vazia' });
-            } else if (!req.body[key]) {
-                check = false;
-                return res.status(400).json({ status: 400, message: `Chave '${key}' com valor vazio.` });
-            } else if (!atributos.includes(key)) {       // Checa se o nome da chave é válido
-                check = false;
-                return res.status(400).json({ status: 400, message: `A chave '${key}' não é válida. Verifique as letras maiúsculas/minúsculas e acentuação.` });
-            }
-        });
+    if (!check) {
+        return res.status(400).json({ status: 400, message: mensagem });
+    }
 
-        // Checa se todas as chaves necessárias estão inclusas
-        if (check) {
-            let conteudo = JSON.stringify(req.body);
+    // Checa se todas as chaves necessárias estão inclusas
+    if (check) {
+        let conteudo = JSON.stringify(req.body);
 
-            // Checa se há as 2 chaves: id e dados.
-            if (!atributos.every(element => conteudo.includes(element))) {
-                check = false;
-                return res.status(400).json({ status: 400, message: `É necessário ter todas as 2 chaves: 'coordenador' e 'id_eleicao'.` });
-            }
+        // Checa se há as 2 chaves: id e dados.
+        if (!atributos.every(element => conteudo.includes(element))) {
+            check = false;
+            return res.status(400).json({ status: 400, message: `É necessário ter todas as 2 chaves: 'coordenador' e 'id_eleicao'.` });
         }
+    }
 
-        if (check) {
-            if (!(typeof req.body.id_eleicao === 'string' || req.body.id_eleicao instanceof String)) {
-                check = false;
-                return res.status(400).json({ status: 400, message: `id_eleicao não é string` });
-            }
+    if (check) {
+        if (!(typeof req.body.id_eleicao === 'string' || req.body.id_eleicao instanceof String)) {
+            check = false;
+            return res.status(400).json({ status: 400, message: `id_eleicao não é string` });
         }
     }
 
@@ -1089,18 +1014,6 @@ app.get('/teste', (req, res) => {
     infos();
 
 });
-
-// Testando um axios para o localhost
-app.get('/auto', (req, res) => {
-    const teste = async () => {
-        const resp = await axios.get('http://localhost:8000/info');
-        console.log(resp.data)
-    }
-
-    teste();
-
-});
-
 
 app.post('/resolver', (req, res) => {
 
@@ -1298,4 +1211,4 @@ const verificacao = async () => {
     }
 }
 
-verificacao(); ''
+verificacao();
