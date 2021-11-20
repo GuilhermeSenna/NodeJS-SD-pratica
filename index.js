@@ -1211,4 +1211,4 @@ const verificacao = async () => {
     }
 }
 
-verificacao();
+// verificacao();
