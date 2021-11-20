@@ -1,5 +1,5 @@
 {
-    "server_name": "Ciclano",
+    "server_name": "Server",
     "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
     "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, etc",
     "versao": "0.1",

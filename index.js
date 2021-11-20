@@ -5,6 +5,7 @@ const express = require('express');
 // File System - Lidar com arquivos
 var fs = require('fs');
 const axios = require('axios');
+const { type } = require('os');
 // const { application } = require('express');
 
 const app = express()
@@ -14,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 let info_default = {
     "server_name": "server",
     "server_endpoint": "https://nodejs-sd-guilhermesenna.herokuapp.com/",
-    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, etc",
+    "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, eleicao, etc",
     "versao": "0.1",
     "status": "online",
     "tipo_de_eleicao_ativa": "valentao"
@@ -110,6 +111,11 @@ let ativos = [
         "url": "https://sd-api-uesc.herokuapp.com/"
     },
     {
+        "id": "201810665",
+        "nome": "Jenilson Ramos Santos",
+        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
+    },
+    {
         "id": "201710396",
         "nome": "Robert Morais Santos Broketa",
         "url": "https://pratica-sd.herokuapp.com/"
@@ -123,22 +129,6 @@ let eleicoes_em_andamento = [];
 
 let json_info = JSON.stringify(info_default);
 let json_peers = JSON.stringify(peers_default);
-
-// async function resetar() {
-//     // Reseta o conteúdo de info
-//     fs.writeFile('info.json', json_info, function (err) {
-//         if (err) {
-//             throw err;
-//         } else {
-//             // Reseta o conteúdo do peers
-//             fs.writeFile('peers.json', json_peers, function (err) {
-//                 if (err)
-//                     throw err;
-//                 res.send('info e peers resetados com sucesso');
-//             });
-//         }
-//     });
-// }
 
 
 app.get('/reset', (req, res) => {
@@ -740,6 +730,16 @@ app.get('/eleicao', (req, res) => {
 
 });
 
+function remover_eleicao(id_eleicao, metodo, coordenador) {
+    let indice = eleicoes_em_andamento.indexOf(id_eleicao);
+    if (indice !== -1) {
+        eleicoes_em_andamento.splice(indice, 1);
+    }
+
+    enviar_log("Success", `Eleição finalizada (${metodo})`, `A eleição ${id_eleicao} foi finalizada, o novo coordenador agora é ${coordenador}.`);
+
+}
+
 app.post('/eleicao', (req, res) => {
 
     let atributos = [
@@ -748,6 +748,8 @@ app.post('/eleicao', (req, res) => {
     ];
 
     let check = true;
+
+    let id_eleicao = req.body.id;
 
     // Tenta ler o arquivo req.body
     if (Object.values(req.body).length === 0) {          // Checa se o JSON está vazio
@@ -793,15 +795,73 @@ app.post('/eleicao', (req, res) => {
 
             if (!err) {           // Se não houver erros...
 
+                // Pega as informações do info
                 var temp = JSON.parse(data.toString());
 
+                // Detecta o tipo de eleição
                 let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
-                // Lembrar também de consultar os endpoints dos outros
+                //Caso for do tipo valentao
                 if (tipo_eleicao == "valentao") {
-                    return res.status(200).json({
-                        status: 200, message: `Valentão escolhido`
-                    });
+
+                    const valentao = async () => {
+                        // Flag para detectar se algum dos servidores está ativo
+                        let alguem_ativo = false;
+
+                        // Log para avisar que o algoritmo está em execução
+                        await enviar_log("Success", `Eleição em processamento (valentao)`, `A eleição ${id_eleicao} está em processamento, em breve será decidido um novo coordenador.`);
+
+                        // Adicionando a eleição na lista de eleições em andamento
+                        eleicoes_em_andamento.push(req.body.id);
+
+                        // Filtra os peers deixando apenas os que tem ID superior ao atual
+                        const ativos_filtrados = ativos.filter(ativo => parseInt(ativo.id) > 201710376);
+
+                        // Não existe servidores com ID menor que o atual
+                        if (!ativos_filtrados.length) {
+                            // Sou o coordenador
+                            // Enviar para todos informando
+                            remover_eleicao(id_eleicao, "valentao", 0);
+                        } else {
+                            pegar_infos(ativos_filtrados)
+                                .then(function (ativos_info) {
+
+                                    // Lista com os infos dos ativos + ID
+                                    if (ativos_info.length) {
+                                        ativos_info.map((ativo) => {
+
+                                            // Status do servidor detectado como ativo
+                                            if (ativo.status == "online") {
+                                                alguem_ativo = true;
+                                                console.log(`enviando para ${ativo.server_endpoint}`);
+                                            }
+                                        });
+
+                                        // Nenhum dos servidores listados está ativo
+                                        if (!alguem_ativo) {
+                                            // Sou o coordenador
+                                            // Enviar para todos informando
+                                            remover_eleicao(id_eleicao, "valentao", 0);
+                                            console.log(eleicoes_em_andamento);
+                                        }
+                                        // Provavel erro, nenhum servidor voltado
+                                    } else {
+                                        enviar_log("Error", `Sem info dos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos, por favor me informe.`);
+                                        remover_eleicao(id_eleicao, "valentao", 0);
+                                    }
+
+                                });
+                        }
+                        // Caso eu seja o novo coordenador
+
+                        return res.status(200).json({
+                            status: 200, message: `Valentão escolhido`
+                        });
+                    }
+
+                    valentao();
+
+
                 } else if (tipo_eleicao == "anel") {
                     // Algoritmo do valentão
                 } else {
@@ -814,7 +874,7 @@ app.post('/eleicao', (req, res) => {
                     });
                 }
 
-                res.send(json);
+                // res.send(json);
             } else {              // Caso haja erros...
                 res.send(err);    // Retorna o erro.
             }
@@ -918,6 +978,66 @@ app.post('/eleicao/:id', (req, res) => {
     }
 
 });
+
+async function get_info(ativo) {
+    // Requisição para a URL do parcipante + a rota desejada (info)
+    try {
+        const resp = await axios.get(ativo.url + "info");
+
+        if (resp.status == 200) {
+            // Adiciona o ID do participante na lista de infos
+            resp.data.id = ativo.id;
+
+            // Retorna a info + ID
+            return resp.data;
+        } else {
+            enviar_log("Warning", `/info HTTP Status diferente de 200`, `O HTTP Status de ${ativo.url} é ${resp.data} e não 200, será desconsiderado na eleição.`);
+            return ([]);
+        }
+    } catch (e) {
+        enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
+        return ([]);
+    }
+
+}
+
+async function pegar_infos(ativos_filtrados) {
+    // Lista das infos de todos os participantes ativos
+    var lista_de_infos = [];
+
+    // Espera acabar todas as promises
+    await Promise.all(
+
+        // Map de todos os peers ativos atualmente
+        ativos_filtrados.map(async (ativo) => {
+            // Retorno da função aonde é feito a requisição das infos
+            const info_ = await get_info(ativo);
+
+            // Adiciona a info obtida na lista de infos
+            if (info_) {
+                lista_de_infos.push(info_);
+            }
+
+        })
+    )
+        // Caso não encontre erros, retorna a lista de infos +ID
+        .then(function () {
+            // console.log(lista_de_infos);
+            // return ("lista_de_infos");
+        })
+
+        // Caso encontre erros, motra a URL aonde ocorreu o erro.
+        .catch(function (err) {
+            // console.log(err);
+            // if (err.hostname) {
+            //     res.status(400).json({ status: 400, message: `Erro ao tentar obter o info de: ${err.hostname}` });
+            // } else {
+            //     res.status(400).json({ status: 400, message: `Erro desconhecido ao tentar obter o` });
+            // }
+
+        });
+    return (lista_de_infos);
+}
 
 app.get('/teste', (req, res) => {
 
@@ -1033,7 +1153,7 @@ app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
 
-function enviar_log(severidade, resumo, comentario) {
+async function enviar_log(severidade, resumo, comentario) {
     let mensagem_log =
     {
         "from": "nodejs-sd-guilhermesenna.herokuapp",
@@ -1042,26 +1162,47 @@ function enviar_log(severidade, resumo, comentario) {
         "body": comentario
     }
 
-    axios.post('https://sd-log-server.herokuapp.com/log', mensagem_log);
-
+    await axios.post('https://sd-log-server.herokuapp.com/log', mensagem_log);
 }
 
 // Verificações para as chamadas consecutivas
 
 function horario_atual() {
-    var date = new Date();
+    var data = new Date();
 
-    var hour = date.getHours();
-    hour = (hour < 10 ? "0" : "") + hour;
+    var hor = data.getHours();
+    hor = (hor < 10 ? "0" : "") + hor;
 
-    var min = date.getMinutes();
+    var min = data.getMinutes();
     min = (min < 10 ? "0" : "") + min;
 
-    var sec = date.getSeconds();
-    sec = (sec < 10 ? "0" : "") + sec;
+    var seg = data.getSeconds();
+    seg = (seg < 10 ? "0" : "") + seg;
 
-    return (horario = hour + ":" + min + ":" + sec);
+    return (hor + ":" + min + ":" + seg);
 }
+
+function gerar_id_eleicao() {
+
+    var data = new Date();
+
+    dia = data.getDate().toString().padStart(2, '0');
+    mes = (data.getMonth() + 1).toString().padStart(2, '0'); //+1 pois no getMonth Janeiro começa com zero.
+
+    var hor = data.getHours();
+    hor = (hor < 10 ? "0" : "") + hor;
+
+    var min = data.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var seg = data.getSeconds();
+    seg = (seg < 10 ? "0" : "") + seg;
+
+    // Geração do código da eleição
+    return (`201710376-${dia}${mes}-${hor}${min}${seg}`);
+
+}
+
 
 // Verificacao contínua se o coordenador está online
 const verificacao = async () => {
@@ -1089,7 +1230,9 @@ const verificacao = async () => {
 
         // if coordenador == offline
         if (true) {
-            let timer_gerado = (Math.floor(Math.random() * (10 - 5 + 1)) + 5);
+            let minimo = 5;
+            let maximo = 10;
+            let timer_gerado = (Math.floor(Math.random() * (maximo - minimo + 1)) + minimo);
             console.log(`[${horario_atual()}] (2ª verificação coordenador) aguardando ${timer_gerado} segundos para testar novamente!`);
 
             // let mensagem_log =
@@ -1124,6 +1267,26 @@ const verificacao = async () => {
                             enviar_log("Error", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador X foi confirmado offline, porém o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
                         } else {
                             enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador X foi confirmado offline, a eleição correrá pelo algoritmo do ${tipo_eleicao}.`);
+
+                            const lancar_eleicao = async () => {
+
+                                let body =
+                                {
+                                    "id": gerar_id_eleicao(),
+                                    "dados": "Eleição gerada por o coordenador X ser detectado como OFFLINE",
+                                }
+
+                                const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                                // const url = 'http://localhost:8000/eleicao';
+
+                                const resp = await axios.post(url, body);
+
+                                if (resp.status != 200) {
+                                    enviar_log("Error", `Erro ao iniciar uma nova eleição`, `Ocorreu um erro ao se tentar iniciar uma nova eleição. Verifique o [POST] /eleicao.`);
+                                }
+                            }
+
+                            lancar_eleicao();
                         }
                     } else {              // Caso haja erros...
                         enviar_log("Error", `Coordenador OFFLINE - Info indisponível`, `O coordenador X foi confirmado offline, porém houve um erro ao tentar ler o arquivo com o info. Verifique o /info e/ou me contate. A eleição não poderá ser iniciada até que se resolva esse erro.`);
@@ -1135,4 +1298,4 @@ const verificacao = async () => {
     }
 }
 
-verificacao();
+verificacao(); ''
