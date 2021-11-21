@@ -26,6 +26,7 @@
 - Checa se está buscando um usuário por ID inexistente
 
 ### Funcionalidades:
+- Código modularizado
 - Implementação de múltiplas requisições externas e outros métodos assíncronos.
 - Armazenamento de logs dos procedimentos realizados durante uma eleição. ([Logs online](https://sd-log-server.herokuapp.com/log) {não criado por mim}) 
 - Permite alterar só o que foi passado (Aonde não há chaves necessárias, como no método PUT)
