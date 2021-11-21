@@ -101,26 +101,59 @@ async function pegar_infos(ativos_filtrados) {
 }
 
 
-async function get_info(ativo) {
+async function get_info(ativo, motivo) {
     // Requisição para a URL do parcipante + a rota desejada (info)
-    try {
-        const resp = await axios.get(ativo.url + "info");
 
-        if (resp.status == 200) {
-            // Adiciona o ID do participante na lista de infos
+
+    let segundos = 9;
+
+    let info;
+
+    await axios({
+        method: 'get',
+        url: ativo.url + "info",
+        timeout: 1000 * segundos
+    })
+        .then(async function (resp) {
             resp.data.id = ativo.id;
             resp.data.nome = ativo.nome;
 
-            // Retorna a info + ID
-            return resp.data;
-        } else {
-            enviar_log("Warning", `/info HTTP Status diferente de 200`, `O HTTP Status de ${ativo.url} é ${resp.data} e não 200, será desconsiderado na eleição.`);
-            return ([]);
-        }
-    } catch (e) {
-        enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
-        return ([]);
-    }
+            info = resp.data
+        })
+        .catch(async function (error) {
+            if (error.code == 'ECONNABORTED') {
+                enviar_log("Warning", `Erro ao tentar obter o /info (Timeout)`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', Verifique o código se está retornando algo. Será desconsiderado da eleição.`);
+            } else {
+                if (motivo) {
+                    enviar_log("Warning", `/info indisponível (${motivo})`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta.`);
+                } else {
+                    enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
+                }
+
+            }
+        });
+
+    return info;
+
+
+    // try {
+    //     const resp = await axios.get(ativo.url + "info");
+
+    //     if (resp.status == 200) {
+    //         // Adiciona o ID do participante na lista de infos
+    //         resp.data.id = ativo.id;
+    //         resp.data.nome = ativo.nome;
+
+    //         // Retorna a info + ID
+    //         return resp.data;
+    //     } else {
+    //         enviar_log("Warning", `/info HTTP Status diferente de 200`, `O HTTP Status de ${ativo.url} é ${resp.data} e não 200, será desconsiderado na eleição.`);
+    //         return ([]);
+    //     }
+    // } catch (e) {
+    //     enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
+    //     return ([]);
+    // }
 
 }
 
@@ -172,4 +205,4 @@ function gerar_id_eleicao() {
 
 }
 
-module.exports = { checagens_iniciais, retornar_recurso, remover_eleicao, pegar_infos, enviar_log, horario_atual, gerar_id_eleicao };
+module.exports = { checagens_iniciais, retornar_recurso, remover_eleicao, pegar_infos, get_info, enviar_log, horario_atual, gerar_id_eleicao };

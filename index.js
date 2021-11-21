@@ -32,6 +32,11 @@ let ativos = [
         "url": "https://sd-api-uesc.herokuapp.com/"
     },
     {
+        "id": "201810665",
+        "nome": "Jenilson Ramos Santos",
+        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
+    },
+    {
         "id": "201710396",
         "nome": "Robert Morais Santos Broketa",
         "url": "https://pratica-sd.herokuapp.com/"
@@ -206,7 +211,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
 
         alguem_ativo = true;
 
-        const enviar_eleicao = async () => {
+        const enviar_eleicao_ = async () => {
 
             let mensagem =
             {
@@ -214,10 +219,12 @@ async function enviar_eleicao(ativo, id_eleicao) {
                 "dados": "valentao"
             }
 
+            let segundos = 9;
+
             await axios({
                 method: 'post',
                 url: ativo.server_endpoint + "eleicao",
-                timeout: 1000 * 1,
+                timeout: 1000 * segundos,
                 data: mensagem
             })
                 .then(async function (response) {
@@ -225,13 +232,16 @@ async function enviar_eleicao(ativo, id_eleicao) {
                     alguem_recebeu = true;
                 })
                 .catch(async function (error) {
-                    console.log(error.message)
-                    await functions.enviar_log("Error", `Erro ao enviar eleição`, `Erro ao enviar a eleição '${id_eleicao}' para '${ativo.server_endpoint}'. Erro: '${error.message}'`);
+                    if (error.code == 'ECONNABORTED') {
+                        await functions.enviar_log("Error", `Erro ao enviar eleição (Timeout)`, `Erro ao enviar a eleição '${id_eleicao}' para '${ativo.server_endpoint}'. Motivo: 'Servidor não respondeu após uma espera de ${segundos} segundos.'`);
+                    } else {
+                        await functions.enviar_log("Error", `Erro ao enviar eleição (HTTP status)`, `Erro ao enviar a eleição '${id_eleicao}' para '${ativo.server_endpoint}'. Erro: '${error.message}'`);
+                    }
                 });
 
         }
 
-        await enviar_eleicao();
+        await enviar_eleicao_();
 
         return ({ alguem_ativo: alguem_ativo, alguem_recebeu: alguem_recebeu });
 
@@ -252,8 +262,11 @@ async function mapear_ativos(ativos_info, id_eleicao) {
         ativos_info.map(async (ativo) => {
 
             let valores = await enviar_eleicao(ativo, id_eleicao);
-            alguem_ativo = valores.alguem_ativo;
-            alguem_recebeu = valores.alguem_recebeu;
+
+            if (valores) {
+                alguem_ativo = valores.alguem_ativo;
+                alguem_recebeu = valores.alguem_recebeu;
+            }
         })
     );
 
@@ -269,9 +282,12 @@ async function informar_coordenador(id, id_eleicao) {
                 "id_eleicao": id_eleicao
             }
 
+            let segundos = 9;
+
             await axios({
                 method: 'post',
                 url: ativo.url + `eleicao/${id}`,
+                timeout: 1000 * segundos,
                 data: mensagem
             })
                 .then(async function (response) {
@@ -279,7 +295,14 @@ async function informar_coordenador(id, id_eleicao) {
                     alguem_recebeu = true;
                 })
                 .catch(async function (error) {
-                    await functions.enviar_log("Error", `Falha ao enviar coordenador`, `Erro ao enviar o novo coordenador '${id}' da eleição '${id_eleicao}' para '${ativo.url}'. Erro: '${error.message}'`);
+
+                    if (error.code == 'ECONNABORTED') {
+                        await functions.enviar_log("Error", `Erro ao enviar coordenador (Timeout)`, `Erro ao enviar o novo coordenador '${id}' da eleição '${id_eleicao}' para '${ativo.url}'. Motivo: 'Servidor não respondeu após uma espera de ${segundos} segundos.'`);
+                    } else {
+                        await functions.enviar_log("Error", `Erro ao enviar coordenador (HTTP status)`, `Erro ao enviar o novo coordenador '${id}' da eleição '${id_eleicao}' para'${ativo.url}'. Erro: '${error.message}'`);
+                    }
+
+                    // await functions.enviar_log("Error", `Falha ao enviar coordenador`, `Erro ao enviar o novo coordenador '${id}' da eleição '${id_eleicao}' para '${ativo.url}'. Erro: '${error.message}'`);
                 });
 
         })
@@ -343,6 +366,7 @@ app.post('/eleicao', (req, res) => {
 
                         // Filtra os peers deixando apenas os que tem ID superior ao atual
                         let ativos_filtrados = ativos.filter(ativo => parseInt(ativo.id) > 201710376);
+
                         // Não existe servidores com ID menor que o atual
                         if (!ativos_filtrados.length) {
                             // Sou o coordenador
@@ -550,4 +574,4 @@ app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
 
-// verificacao.verificacao();
+verificacao.verificacao(ativos);
