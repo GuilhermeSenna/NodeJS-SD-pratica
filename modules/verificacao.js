@@ -62,9 +62,9 @@ const verificacao = async () => {
 
                     if (!err) {           // Se não houver erros...
                         if (tipo_eleicao != 'valentao' && tipo_eleicao != 'anel') {
-                            functions.enviar_log("Error", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador X foi confirmado offline, porém o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
+                            functions.enviar_log("Critical", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador X foi confirmado offline, porém a eleição não poderá ser iniciada pois o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
                         } else {
-                            functions.enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador X foi confirmado offline, a eleição correrá pelo algoritmo do ${tipo_eleicao}.`);
+                            functions.enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador X foi confirmado offline, a eleição ocorrerá pelo algoritmo do ${tipo_eleicao}.`);
 
                             const lancar_eleicao = async () => {
 
@@ -74,8 +74,8 @@ const verificacao = async () => {
                                     "dados": "Eleição gerada por o coordenador X ser detectado como OFFLINE",
                                 }
 
-                                const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
-                                // const url = 'http://localhost:8000/eleicao';
+                                // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                                const url = 'http://localhost:8000/eleicao';
 
                                 const resp = await axios.post(url, body);
 

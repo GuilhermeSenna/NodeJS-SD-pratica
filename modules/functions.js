@@ -46,13 +46,18 @@ function retornar_recurso() {
     return (json);
 }
 
-function remover_eleicao(id_eleicao, metodo, coordenador, eleicoes) {
+function remover_eleicao(id_eleicao, metodo, coordenador, eleicoes, motivo) {
     let indice = eleicoes.indexOf(id_eleicao);
     if (indice !== -1) {
         eleicoes.splice(indice, 1);
     }
 
-    enviar_log("Success", `Eleição finalizada (${metodo})`, `A eleição ${id_eleicao} foi finalizada, o novo coordenador agora é ${coordenador}.`);
+    if (motivo) {
+        enviar_log("Attention", `Eleição finalizada (${metodo})`, `A eleição '${id_eleicao}' foi finalizada, o novo coordenador agora é '${coordenador}'. Motivo: '${motivo}.'`);
+    } else {
+        // enviar_log("Attention", `Eleição finalizada (${metodo})`, `A eleição '${id_eleicao}' foi finalizada, o novo coordenador agora é '${coordenador}.'`);
+    }
+
 
     return eleicoes;
 }
@@ -104,6 +109,7 @@ async function get_info(ativo) {
         if (resp.status == 200) {
             // Adiciona o ID do participante na lista de infos
             resp.data.id = ativo.id;
+            resp.data.nome = ativo.nome;
 
             // Retorna a info + ID
             return resp.data;
