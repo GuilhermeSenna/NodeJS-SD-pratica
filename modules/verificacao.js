@@ -74,8 +74,8 @@ const verificacao = async () => {
                                     "dados": "Eleição gerada por o coordenador X ser detectado como OFFLINE",
                                 }
 
-                                // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
-                                const url = 'http://localhost:8000/eleicao';
+                                const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                                // const url = 'http://localhost:8000/eleicao';
 
                                 const resp = await axios.post(url, body);
 
