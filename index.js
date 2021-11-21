@@ -217,6 +217,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
             await axios({
                 method: 'post',
                 url: ativo.server_endpoint + "eleicao",
+                timeout: 1000 * 1,
                 data: mensagem
             })
                 .then(async function (response) {
@@ -224,6 +225,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
                     alguem_recebeu = true;
                 })
                 .catch(async function (error) {
+                    console.log(error.message)
                     await functions.enviar_log("Error", `Erro ao enviar eleição`, `Erro ao enviar a eleição '${id_eleicao}' para '${ativo.server_endpoint}'. Erro: '${error.message}'`);
                 });
 
@@ -548,4 +550,4 @@ app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
 
-verificacao.verificacao();
+// verificacao.verificacao();
