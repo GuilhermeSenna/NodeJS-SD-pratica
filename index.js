@@ -261,11 +261,14 @@ async function mapear_ativos(ativos_info, id_eleicao) {
     await Promise.all(
         ativos_info.map(async (ativo) => {
 
-            let valores = await enviar_eleicao(ativo, id_eleicao);
+            console.log(`-> ${ativo.id}`);
+            if (ativo.id != '201710376') {
+                let valores = await enviar_eleicao(ativo, id_eleicao);
 
-            if (valores) {
-                alguem_ativo = valores.alguem_ativo;
-                alguem_recebeu = valores.alguem_recebeu;
+                if (valores) {
+                    alguem_ativo = valores.alguem_ativo;
+                    alguem_recebeu = valores.alguem_recebeu;
+                }
             }
         })
     );
