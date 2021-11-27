@@ -529,11 +529,9 @@ app.post('/eleicao', (req, res) => {
 
 });
 
-app.post('/eleicao/:id', (req, res) => {
+app.post('/eleicao/coordenador', (req, res) => {
 
-    console.log(req.body);
-
-    let id = req.params.id;
+    // let id = req.params.id;
 
     let atributos = [
         'coordenador',
