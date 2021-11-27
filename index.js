@@ -322,7 +322,12 @@ app.post('/eleicao', (req, res) => {
 
     let id_eleicao = req.body.id;
 
-    console.log(`[${functions.horario_atual()}] {${req.ip}} Iniciando eleição ${id_eleicao}`);
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    console.log(`[${functions.horario_atual()}] {${ip}} Iniciando eleição ${id_eleicao}`);
 
     let { check, mensagem } = functions.checagens_iniciais(atributos, req.body);
 
