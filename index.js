@@ -216,7 +216,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
             let mensagem =
             {
                 "id": id_eleicao,
-                "dados": "valentao"
+                "dados": []
             }
 
             let segundos = 9;
