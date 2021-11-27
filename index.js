@@ -322,6 +322,8 @@ app.post('/eleicao', (req, res) => {
 
     let id_eleicao = req.body.id;
 
+    console.log(`[${functions.horario_atual()}] Iniciando eleição ${id_eleicao}`)
+
     let { check, mensagem } = functions.checagens_iniciais(atributos, req.body);
 
     if (!check) {
@@ -370,6 +372,8 @@ app.post('/eleicao', (req, res) => {
                         // Filtra os peers deixando apenas os que tem ID superior ao atual
                         let ativos_filtrados = ativos.filter(ativo => parseInt(ativo.id) > 201710376);
 
+                        console.log(`[${functions.horario_atual()}] Ativos filtrados por ID - ${ativos_filtrados}`)
+
                         // Não existe servidores com ID menor que o atual
                         if (!ativos_filtrados.length) {
                             // Sou o coordenador
@@ -377,10 +381,12 @@ app.post('/eleicao', (req, res) => {
                             // await functions.enviar_log("Success", `Eleição finalizada - Nenhum servidor com ID maior`, `Fim da eleição '${id_eleicao}', o novo coordenador será '201710376' pois é o que tem maior ID dos atuais.`);
 
                             if (temp.status == 'online') {
+                                console.log(`[${functions.horario_atual()}] (Sou o coordenador) - Possuo o maior ID`)
                                 eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Possui o maior ID dos atuais.");
                                 await informar_coordenador(201710376, id_eleicao);
                                 coordenador = 201710376;
                             } else {
+                                console.log(`[${functions.horario_atual()}] Estou offline apesar do ID maior`)
                                 functions.enviar_log("Warning", `Abstenção da eleição`, `O servidor atual se abstem da eleição '${id_eleicao}', pois apesar de ter o ID maior que os demais, está offline. (A eleição será removida da lista por segurança)`);
                                 eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                             }
@@ -388,6 +394,8 @@ app.post('/eleicao', (req, res) => {
                             // Pegar info de todos os servidores
                             functions.pegar_infos(ativos_filtrados)
                                 .then(function (ativos_info) {
+
+                                    console.log(`[${functions.horario_atual()}] Ativos info - ${ativos_filtrados}`)
 
                                     // Lista com os infos dos ativos + ID
                                     if (ativos_info.length) {
@@ -397,15 +405,19 @@ app.post('/eleicao', (req, res) => {
                                         (async () => {
                                             let { alguem_ativo, alguem_recebeu } = await mapear_ativos(ativos_info, id_eleicao);
 
+                                            console.log(`[${functions.horario_atual()}] Alguem recebeu? - ${alguem_recebeu} Alguem ativo? - ${alguem_ativo}`);
+
                                             if (!alguem_ativo) {
                                                 // Sou o coordenador
                                                 // Enviar para todos informando
                                                 // await functions.enviar_log("Success", `Eleição finalizada - Nenhum servidor ativo`, `Fim da eleição '${id_eleicao}', o coordenador será o atual (201710376) pois nenhum outro está ativo.`);
                                                 if (temp.status == 'online') {
+                                                    console.log(`[${functions.horario_atual()}] (Sou o coordenador) - Nenhum outro está ativo`)
                                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Nenhum outro está ativo");
                                                     await informar_coordenador(201710376, id_eleicao);
                                                     coordenador = 201710376;
                                                 } else {
+                                                    console.log(`[${functions.horario_atual()}] (Eleição cancelada) - Todos offline`);
                                                     functions.enviar_log("Error", `Eleição cancelada - Todos os servidores offlines`, `A eleição ${id_eleicao} está sendo cancelada, pois todos os servidores estão offline, logo não é possível decidir o coordenador.`);
                                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                                 }
@@ -413,6 +425,7 @@ app.post('/eleicao', (req, res) => {
                                                 // await functions.enviar_log("Error", `Eleição cancelada - Nenhum servidor recebeu`, `A eleição '${id_eleicao}' está sendo cancelada, pois nenhum servidor recebeu a mensagem. [POST /eleicao]`);
                                                 // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
 
+                                                console.log(`[${functions.horario_atual()}] (Sou o coordenador) - Ninguém recebeu`)
                                                 eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Nenhum servidor recebeu");
                                                 await informar_coordenador(201710376, id_eleicao);
                                                 coordenador = 201710376;
@@ -421,6 +434,7 @@ app.post('/eleicao', (req, res) => {
 
                                         // Provavel erro, nenhum servidor voltado
                                     } else {
+                                        console.log(`[${functions.horario_atual()}] (Eleição cancelada) - Sem info dos servidores`);
                                         functions.enviar_log("Error", `Eleição cancelada - Sem info dos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos, por favor me informe se esse erro ocorrer.`);
                                         eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                     }
@@ -535,6 +549,8 @@ app.post('/eleicao', (req, res) => {
 app.post('/eleicao/coordenador', (req, res) => {
 
     // let id = req.params.id;
+
+    console.log(`[${functions.horario_atual()}] (Novo coordenador recebido) - ID eleição: ${req.body.id_eleicao} / novo coordenador: ${coordenador}`);
 
     let atributos = [
         'coordenador',

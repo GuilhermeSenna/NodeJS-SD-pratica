@@ -39,11 +39,11 @@ const verificacao = async (ativos) => {
 
     while (true) {
 
+        // Voltar depois
         let coordenador = await axios.get("https://nodejs-sd-guilhermesenna.herokuapp.com/coordenador");
         // let coordenador = await axios.get("http://localhost:8000/coordenador");
         coordenador = coordenador.data.coordenador_atual;
 
-        console.log(coordenador)
 
         // let mensagem_log =
         // {
@@ -86,8 +86,12 @@ const verificacao = async (ativos) => {
             // Verificar na lista de ativos
             var ativo = ativos.filter(ativo_ => ativo_.id == coordenador);
 
+            // console.log(ativo);
+
             if (ativo.length) { // Caso esteja na lista de ativos
                 let info_peer = await functions.get_info(ativo[0], "Primeira verificação");
+
+                // console.log(info_peer);
 
                 if (info_peer) {
                     // Caso esteja offline
