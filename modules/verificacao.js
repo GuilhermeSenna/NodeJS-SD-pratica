@@ -107,8 +107,8 @@ const verificacao = async (ativos) => {
         }
 
         if (verificar) {
-            let minimo = 5;
-            let maximo = 10;
+            let minimo = 20;
+            let maximo = 30;
             let timer_gerado = (Math.floor(Math.random() * (maximo - minimo + 1)) + minimo);
             console.log(`[${functions.horario_atual()}] (2ª verificação coordenador) aguardando ${timer_gerado} segundos para testar novamente!`);
 
