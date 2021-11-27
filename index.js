@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let ativos = [
-    {
-        "id": "201720295",
-        "nome": "Allana Dos Santos Campos",
-        "url": "https://sd-ascampos-20212.herokuapp.com/"
-    },
+    // {
+    //     "id": "201720295",
+    //     "nome": "Allana Dos Santos Campos",
+    //     "url": "https://sd-ascampos-20212.herokuapp.com/"
+    // },
     {
         "id": "201710376",
         "nome": "Guilherme Senna Cruz",
@@ -31,11 +31,11 @@ let ativos = [
         "nome": "Hiago Rios Cordeiro",
         "url": "https://sd-api-uesc.herokuapp.com/"
     },
-    {
-        "id": "201810665",
-        "nome": "Jenilson Ramos Santos",
-        "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
-    },
+    // {
+    //     "id": "201810665",
+    //     "nome": "Jenilson Ramos Santos",
+    //     "url": "https://jenilsonramos-sd-20211.herokuapp.com/"
+    // },
     {
         "id": "201710396",
         "nome": "Robert Morais Santos Broketa",
