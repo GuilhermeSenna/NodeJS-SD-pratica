@@ -42,6 +42,7 @@ const verificacao = async (ativos) => {
         let coordenador = await axios.get("https://nodejs-sd-guilhermesenna.herokuapp.com/coordenador");
         // let coordenador = await axios.get("http://localhost:8000/coordenador");
         coordenador = coordenador.data.coordenador_atual;
+
         console.log(coordenador)
 
         // let mensagem_log =

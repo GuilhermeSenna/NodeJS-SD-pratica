@@ -286,7 +286,7 @@ async function informar_coordenador(id, id_eleicao) {
 
             await axios({
                 method: 'post',
-                url: ativo.url + `eleicao/${id}`,
+                url: ativo.url + `eleicao/coordenador`,
                 timeout: 1000 * segundos,
                 data: mensagem
             })
