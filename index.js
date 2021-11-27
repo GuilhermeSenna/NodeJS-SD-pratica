@@ -407,8 +407,12 @@ app.post('/eleicao', (req, res) => {
                                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                                 }
                                             } else if (!alguem_recebeu) {
-                                                await functions.enviar_log("Error", `Eleição cancelada - Nenhum servidor recebeu`, `A eleição '${id_eleicao}' está sendo cancelada, pois nenhum servidor recebeu a mensagem. [POST /eleicao]`);
-                                                eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+                                                // await functions.enviar_log("Error", `Eleição cancelada - Nenhum servidor recebeu`, `A eleição '${id_eleicao}' está sendo cancelada, pois nenhum servidor recebeu a mensagem. [POST /eleicao]`);
+                                                // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+
+                                                eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Nenhum servidor recebeu");
+                                                await informar_coordenador(201710376, id_eleicao);
+                                                coordenador = 201710376;
                                             }
                                         })();
 
