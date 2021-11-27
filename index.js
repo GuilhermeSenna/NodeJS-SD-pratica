@@ -46,7 +46,7 @@ let ativos = [
 let codigo = -1;
 let expiracao = -1;
 let valor = -1;
-let coordenador = -1;
+let coordenador = 201710396;
 let eleicoes_em_andamento = [];
 
 app.use(require('./routes/basicas'));
@@ -322,12 +322,12 @@ app.post('/eleicao', (req, res) => {
 
     let id_eleicao = req.body.id;
 
-    var ip = req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress;
+    // var ip = req.headers['x-forwarded-for'] ||
+    //     req.connection.remoteAddress ||
+    //     req.socket.remoteAddress ||
+    //     req.connection.socket.remoteAddress;
 
-    console.log(`[${functions.horario_atual()}] {${ip}} Iniciando eleição ${id_eleicao}`);
+    console.log(`[${functions.horario_atual()}] Iniciando eleição ${id_eleicao}`);
 
     let { check, mensagem } = functions.checagens_iniciais(atributos, req.body);
 
