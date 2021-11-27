@@ -46,7 +46,7 @@ let ativos = [
 let codigo = -1;
 let expiracao = -1;
 let valor = -1;
-let coordenador = 201710396;
+let coordenador = -1;
 let eleicoes_em_andamento = [];
 
 app.use(require('./routes/basicas'));
@@ -221,6 +221,8 @@ async function enviar_eleicao(ativo, id_eleicao) {
 
             let segundos = 9;
 
+            console.log(ativo);
+
             await axios({
                 method: 'post',
                 url: ativo.server_endpoint + "eleicao",
@@ -261,14 +263,11 @@ async function mapear_ativos(ativos_info, id_eleicao) {
     await Promise.all(
         ativos_info.map(async (ativo) => {
 
-            console.log(`-> ${ativo.id}`);
-            if (ativo.id != '201710376') {
-                let valores = await enviar_eleicao(ativo, id_eleicao);
+            let valores = await enviar_eleicao(ativo, id_eleicao);
 
-                if (valores) {
-                    alguem_ativo = valores.alguem_ativo;
-                    alguem_recebeu = valores.alguem_recebeu;
-                }
+            if (valores) {
+                alguem_ativo = valores.alguem_ativo;
+                alguem_recebeu = valores.alguem_recebeu;
             }
         })
     );
@@ -279,6 +278,9 @@ async function mapear_ativos(ativos_info, id_eleicao) {
 async function informar_coordenador(id, id_eleicao) {
     await Promise.all(
         ativos.map(async (ativo) => {
+
+            console.log(`[${functions.horario_atual()}] Enviando coordenador para ${ativo.url}`);
+
             let mensagem =
             {
                 "coordenador": id,
