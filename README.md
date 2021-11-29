@@ -13,7 +13,7 @@
 - '/resolver', com métodos GET {comentado} e POST
 - '/coordenador', com método GET
 - '/eleicao', com método GET e POST
-- '/eleicao/:id', com método POST
+- '/eleicao/coordenado', com método POST
 - '/reset', retorna o conteúdo do peers e info para o padrão
 
 ### Checagens:
