@@ -181,49 +181,6 @@ const verificacao = async (ativos) => {
             // if coordenador == offline
             if (verificar && !is_election_on) {
 
-                // fs.readFile('info.json', function (err, data) {
-
-                //     try {
-                //         let temp = JSON.parse(data.toString());
-                //         console.log(temp)
-                //         var tipo_eleicao = temp.tipo_de_eleicao_ativa;
-                //     } catch (e) {
-                //         // Esse erro provavelmente é com o arquivo
-                //         // Será informado no Log.
-                //     }
-
-
-                //     if (!err) {           // Se não houver erros...
-                //         if (tipo_eleicao != 'valentao' && tipo_eleicao != 'anel') {
-                //             functions.enviar_log("Critical", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador X foi confirmado offline, porém a eleição não poderá ser iniciada pois o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
-                //         } else {
-                //             functions.enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador X foi confirmado offline, a eleição ocorrerá pelo algoritmo do ${tipo_eleicao}.`);
-
-                //             const lancar_eleicao = async () => {
-
-                //                 let body =
-                //                 {
-                //                     "id": functions.gerar_id_eleicao(),
-                //                     "dados": "Eleição gerada por o coordenador X ser detectado como OFFLINE",
-                //                 }
-
-                //                 // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
-                //                 const url = 'http://localhost:8000/eleicao';
-
-                //                 const resp = await axios.post(url, body);
-
-                //                 if (resp.status != 200) {
-                //                     functions.enviar_log("Error", `Erro ao iniciar uma nova eleição`, `Ocorreu um erro ao se tentar iniciar uma nova eleição. Verifique o [POST] /eleicao.`);
-                //                 }
-                //             }
-
-                //             lancar_eleicao();
-                //         }
-                //     } else {              // Caso haja erros...
-                //         functions.enviar_log("Error", `Coordenador OFFLINE - Info indisponível`, `O coordenador X foi confirmado offline, porém houve um erro ao tentar ler o arquivo com o info. Verifique o /info e/ou me contate. A eleição não poderá ser iniciada até que se resolva esse erro.`);
-                //     }
-                // });
-
                 // Lê o info
                 let leitura = await ler_arquivo();
 

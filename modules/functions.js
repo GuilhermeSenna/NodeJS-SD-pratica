@@ -127,7 +127,7 @@ async function get_info(ativo, motivo) {
                 if (motivo) {
                     // enviar_log("Warning", `/info indisponível (${motivo})`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta.`);
                 } else {
-                    enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
+                    // enviar_log("Warning", `/info indisponível`, `Erro ao tentar obter o /info de '${ativo.nome}' - '${ativo.url}', confira a URL para ver está correta. Será desconsiderado da eleição.`);
                 }
 
             }

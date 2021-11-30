@@ -501,6 +501,8 @@ app.post('/eleicao', (req, res) => {
                                             if (ativos_info[posicao].status == 'online') {
                                                 const enviar_eleicao_anel = async () => {
 
+                                                    console.log(ativos_info[posicao])
+
                                                     let dados_temp = req.body.dados;
                                                     dados_temp.push('201710376');
                                                     dados_temp.push('201710375');
@@ -547,8 +549,19 @@ app.post('/eleicao', (req, res) => {
                                         eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                     }
                                 } else {
-                                    console.log('meu id na lista');
-                                    console.log(req.body.dados);
+
+                                    // Quando meu ID está no array
+
+                                    var max = Math.max.apply(null, req.body.dados);
+
+                                    if (max == 201710376) {
+                                        console.log("aca")
+                                    }
+
+                                    // console.log(`[${functions.horario_atual()}] (Sou o coordenador) - Ninguém recebeu`)
+                                    // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Nenhum servidor recebeu");
+                                    // await informar_coordenador(201710376, id_eleicao);
+                                    // coordenador = 201710376;
 
 
                                 }
