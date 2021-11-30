@@ -244,7 +244,7 @@ const verificacao = async (ativos) => {
                             let body =
                             {
                                 "id": functions.gerar_id_eleicao(),
-                                "dados": `Eleição gerada por o coordenador ${coordenador} ser detectado como OFFLINE`,
+                                "dados": `[]`,
                             }
 
                             const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';

@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let ativos = [
-    // {
-    //     "id": "201720295",
-    //     "nome": "Allana Dos Santos Campos",
-    //     "url": "https://sd-ascampos-20212.herokuapp.com/"
-    // },
+    {
+        "id": "201720295",
+        "nome": "Allana Dos Santos Campos",
+        "url": "https://sd-ascampos-20212.herokuapp.com/"
+    },
     {
         "id": "201710376",
         "nome": "Guilherme Senna Cruz",
@@ -167,12 +167,12 @@ app.get('/coordenador', (req, res) => {
 
     if (coordenador == 201710376) {
         json = {
-            "coordenador": "true",
+            "coordenador": true,
             "coordenador_atual": 201710376
         };
     } else {
         json = {
-            "coordenador": "false",
+            "coordenador": false,
             "coordenador_atual": coordenador
         };
     }
@@ -476,49 +476,54 @@ app.post('/eleicao', (req, res) => {
 
                                 // Checar se meu ID está incluso na lista de ID's
 
-                                // Lista com os infos dos ativos + ID
-                                if (ativos_info.length && ativos_info.length != 1) {
 
-                                    // Ordenar pelo nome
-                                    ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
+                                if (!req.body.dados.includes('201710376')) {
+                                    // Lista com os infos dos ativos + ID
+                                    if (ativos_info.length && ativos_info.length != 1) {
+
+                                        // Ordenar pelo nome
+                                        ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
 
 
-                                    let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
+                                        let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
 
-                                    // Caso mande para uma posição além do possível, será consertado no início do laço while
-                                    // Exemplo: Posição 2 em um vetor de tamanho 2.
-                                    let posicao = index + 1;
-                                    let cont = 0;
-                                    let ninguem_apto = false;
+                                        // Caso mande para uma posição além do possível, será consertado no início do laço while
+                                        // Exemplo: Posição 2 em um vetor de tamanho 2.
+                                        let posicao = index + 1;
+                                        let cont = 0;
+                                        let ninguem_apto = false;
 
-                                    while (true) {
-                                        if (posicao >= ativos_info.length) {
-                                            posicao = 0;
-                                        }
+                                        while (true) {
+                                            if (posicao >= ativos_info.length) {
+                                                posicao = 0;
+                                            }
 
-                                        console.log(ativos_info[posicao])
+                                            console.log(ativos_info[posicao])
 
-                                        if (ativos_info[posicao].status == 'online') {
-                                            // Push com meu ID na lista e eleições e enviar
-                                            break;
-                                        } else {
-                                            posicao += 1
-                                            cont += 1;
-
-                                            if (cont == ativos_info.length) {
-                                                ninguem_apto = true;
+                                            if (ativos_info[posicao].status == 'online') {
+                                                // Push com meu ID na lista e eleições e enviar
                                                 break;
+                                            } else {
+                                                posicao += 1
+                                                cont += 1;
+
+                                                if (cont == ativos_info.length) {
+                                                    ninguem_apto = true;
+                                                    break;
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if (ninguem_apto) {
-                                        functions.enviar_log("Error", `Eleição cancelada - Todos os servidores offlines`, `A eleição ${id_eleicao} está sendo cancelada, pois todos os servidores estão offline, logo não é possível decidir o coordenador.`);
+                                        if (ninguem_apto) {
+                                            functions.enviar_log("Error", `Eleição cancelada - Todos os servidores offlines`, `A eleição ${id_eleicao} está sendo cancelada, pois todos os servidores estão offline, logo não é possível decidir o coordenador.`);
+                                            eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+                                        }
+                                    } else {
+                                        functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor ou apenas 1 é retornado ao se pedir a lista de infos.`);
                                         eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                     }
                                 } else {
-                                    functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor ou apenas 1 é retornado ao se pedir a lista de infos.`);
-                                    eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+
                                 }
 
                             });
