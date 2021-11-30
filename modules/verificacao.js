@@ -244,7 +244,7 @@ const verificacao = async (ativos) => {
                             let body =
                             {
                                 "id": functions.gerar_id_eleicao(),
-                                "dados": `[]`,
+                                "dados": [],
                             }
 
                             const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';

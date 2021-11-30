@@ -168,12 +168,12 @@ app.get('/coordenador', (req, res) => {
     if (coordenador == 201710376) {
         json = {
             "coordenador": true,
-            "coordenador_atual": 201710376
+            "coordenador_atual": "201710376"
         };
     } else {
         json = {
             "coordenador": false,
-            "coordenador_atual": coordenador
+            "coordenador_atual": toString(coordenador)
         };
     }
 
@@ -222,7 +222,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
 
             let segundos = 9;
 
-            console.log(ativo);
+            // console.log(ativo);
 
             await axios({
                 method: 'post',
@@ -479,7 +479,7 @@ app.post('/eleicao', (req, res) => {
 
                                 if (!req.body.dados.includes('201710376')) {
                                     // Lista com os infos dos ativos + ID
-                                    if (ativos_info.length && ativos_info.length != 1) {
+                                    if (ativos_info.length) {
 
                                         // Ordenar pelo nome
                                         ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
@@ -498,9 +498,33 @@ app.post('/eleicao', (req, res) => {
                                                 posicao = 0;
                                             }
 
-                                            console.log(ativos_info[posicao])
-
                                             if (ativos_info[posicao].status == 'online') {
+                                                const enviar_eleicao_anel = async () => {
+
+                                                    let dados_temp = req.body.dados;
+                                                    dados_temp.push('201710376');
+                                                    dados_temp.push('201710375');
+                                                    dados_temp.push('201710377');
+
+                                                    let body =
+                                                    {
+                                                        "id": functions.gerar_id_eleicao(),
+                                                        "dados": dados_temp,
+                                                    }
+
+                                                    // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                                                    const url = 'http://localhost:8000/eleicao';
+
+                                                    const resp = await axios.post(url, body);
+
+                                                    if (resp.status != 200) {
+                                                        functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
+                                                    } else {
+                                                        is_election_on = true;
+                                                    }
+                                                }
+
+                                                enviar_eleicao_anel()
                                                 // Push com meu ID na lista e eleições e enviar
                                                 break;
                                             } else {
@@ -519,10 +543,13 @@ app.post('/eleicao', (req, res) => {
                                             eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                         }
                                     } else {
-                                        functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor ou apenas 1 é retornado ao se pedir a lista de infos.`);
+                                        functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos.`);
                                         eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                     }
                                 } else {
+                                    console.log('meu id na lista');
+                                    console.log(req.body.dados);
+
 
                                 }
 
