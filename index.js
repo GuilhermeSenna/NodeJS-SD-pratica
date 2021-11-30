@@ -47,6 +47,7 @@ let codigo = -1;
 let expiracao = -1;
 let valor = -1;
 let coordenador = -1;
+let is_election_on = false;
 let eleicoes_em_andamento = [];
 
 app.use(require('./routes/basicas'));
@@ -230,7 +231,7 @@ async function enviar_eleicao(ativo, id_eleicao) {
                 data: mensagem
             })
                 .then(async function (response) {
-                    await functions.enviar_log("Success", `Eleição enviada com sucesso`, `A eleição '${id_eleicao}' foi enviada com sucesso para '${ativo.server_endpoint}'`);
+                    // await functions.enviar_log("Success", `Eleição enviada com sucesso`, `A eleição '${id_eleicao}' foi enviada com sucesso para '${ativo.server_endpoint}'`);
                     alguem_recebeu = true;
                 })
                 .catch(async function (error) {
@@ -557,6 +558,8 @@ app.post('/eleicao/coordenador', (req, res) => {
 
     // let id = req.params.id;
 
+    is_election_on = false;
+
     console.log(`[${functions.horario_atual()}] (Novo coordenador recebido) - ID eleição: ${req.body.id_eleicao} / novo coordenador: ${coordenador}`);
 
     let atributos = [
@@ -673,4 +676,4 @@ app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
 
-verificacao.verificacao(ativos);
+verificacao.verificacao(ativos, is_election_on, coordenador);

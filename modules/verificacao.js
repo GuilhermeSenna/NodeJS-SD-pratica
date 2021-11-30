@@ -30,7 +30,7 @@ async function ler_arquivo() {
 // }
 
 // Verificacao contínua se o coordenador está online
-const verificacao = async (ativos) => {
+const verificacao = async (ativos, is_election_on, coordenador) => {
     function sleep(ms) {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
@@ -39,10 +39,13 @@ const verificacao = async (ativos) => {
 
     while (true) {
 
+        console.log(is_election_on);
+        console.log(coordenador);
+
         // Voltar depois
-        let coordenador = await axios.get("https://nodejs-sd-guilhermesenna.herokuapp.com/coordenador");
+        // let coordenador = await axios.get("https://nodejs-sd-guilhermesenna.herokuapp.com/coordenador");
         // let coordenador = await axios.get("http://localhost:8000/coordenador");
-        coordenador = coordenador.data.coordenador_atual;
+        // coordenador = coordenador.data.coordenador_atual;
 
 
 
@@ -108,7 +111,7 @@ const verificacao = async (ativos) => {
             }
         }
 
-        if (verificar) {
+        if (verificar && !is_election_on) {
             let minimo = 5;
             let maximo = 10;
             let timer_gerado = (Math.floor(Math.random() * (maximo - minimo + 1)) + minimo);
@@ -170,7 +173,7 @@ const verificacao = async (ativos) => {
             }
 
             // if coordenador == offline
-            if (verificar) {
+            if (verificar && !is_election_on) {
 
                 // fs.readFile('info.json', function (err, data) {
 
@@ -228,7 +231,7 @@ const verificacao = async (ativos) => {
                     if (tipo_eleicao != 'valentao' && tipo_eleicao != 'anel') {
                         functions.enviar_log("Critical", `Coordenador OFFLINE - Tipo de eleição inválido`, `O coordenador '${coordenador}' foi confirmado offline, porém a eleição não poderá ser iniciada pois o tipo de eleicão está como '${tipo_eleicao}' que não é um valor válido. Os valores possíveis são 'anel' ou 'valentao'. Tudo minúsculo e sem acento. A eleição só poderá ser iniciada quando houver um tipo de eleição válido no /info.`);
                     } else {
-                        functions.enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador '${coordenador}' foi confirmado offline, a eleição ocorrerá pelo algoritmo do '${tipo_eleicao}'.`);
+                        // functions.enviar_log("Success", `Iniciando nova eleição (Coordenador OFFLINE)`, `O coordenador '${coordenador}' foi confirmado offline, a eleição ocorrerá pelo algoritmo do '${tipo_eleicao}'.`);
 
                         const lancar_eleicao = async () => {
 
@@ -238,13 +241,15 @@ const verificacao = async (ativos) => {
                                 "dados": `Eleição gerada por o coordenador ${coordenador} ser detectado como OFFLINE`,
                             }
 
-                            const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
-                            // const url = 'http://localhost:8000/eleicao';
+                            // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                            const url = 'http://localhost:8000/eleicao';
 
                             const resp = await axios.post(url, body);
 
                             if (resp.status != 200) {
                                 functions.enviar_log("Error", `Erro ao iniciar uma nova eleição`, `Ocorreu um erro ao se tentar iniciar uma nova eleição. Verifique o [POST] /eleicao.`);
+                            } else {
+                                is_election_on = true;
                             }
                         }
 
