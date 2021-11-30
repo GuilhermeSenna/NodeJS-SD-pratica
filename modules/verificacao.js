@@ -3,6 +3,14 @@ const functions = require("../modules/functions");
 const fs = require('fs').promises;
 const axios = require('axios');
 
+let coordenador, is_election_on;
+
+function atualizar_valores(cd, ie) {
+
+    coordenador = cd;
+    is_election_on = ie;
+}
+
 async function ler_arquivo() {
     try {
         const data = await fs.readFile("info.json");
@@ -30,7 +38,7 @@ async function ler_arquivo() {
 // }
 
 // Verificacao contínua se o coordenador está online
-const verificacao = async (ativos, is_election_on, coordenador) => {
+const verificacao = async (ativos) => {
     function sleep(ms) {
         return new Promise((resolve) => {
             setTimeout(resolve, ms);
@@ -38,15 +46,13 @@ const verificacao = async (ativos, is_election_on, coordenador) => {
     }
 
     while (true) {
-
-        console.log(is_election_on);
-        console.log(coordenador);
-
         // Voltar depois
         // let coordenador = await axios.get("https://nodejs-sd-guilhermesenna.herokuapp.com/coordenador");
         // let coordenador = await axios.get("http://localhost:8000/coordenador");
         // coordenador = coordenador.data.coordenador_atual;
 
+
+        console.log(`Coordenador: ${coordenador} / Eleição ativa? - ${is_election_on}`)
 
 
 
@@ -270,4 +276,4 @@ const verificacao = async (ativos, is_election_on, coordenador) => {
     }
 }
 
-module.exports = { verificacao };
+module.exports = { verificacao, atualizar_valores };

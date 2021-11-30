@@ -559,6 +559,7 @@ app.post('/eleicao/coordenador', (req, res) => {
     // let id = req.params.id;
 
     is_election_on = false;
+    verificacao.atualizar_valores(coordenador, is_election_on);
 
     console.log(`[${functions.horario_atual()}] (Novo coordenador recebido) - ID eleição: ${req.body.id_eleicao} / novo coordenador: ${coordenador}`);
 
@@ -621,59 +622,10 @@ app.post('/eleicao/coordenador', (req, res) => {
 
 });
 
-app.get('/teste', (req, res) => {
-
-    // Lista das infos de todos os participantes ativos
-    lista_de_infos = [];
-
-    // Função que requisita a info dos participantes
-    const get_info = async (ativo) => {
-        // Requisição para a URL do parcipante + a rota desejada (info)
-        const resp = await axios.get(ativo.url + "info");
-
-        // Adiciona o ID do parcipante na lista de infos
-        resp.data.id = ativo.id;
-
-        // Retorna a info + ID
-        return resp.data;
-    };
-
-    // Função para capturar todas as infos
-    const infos = async () => {
-
-        // Espera acabar todas as promises
-        Promise.all(
-
-            // Map de todos os peers ativos atualmente
-            ativos.map(async (ativo) => {
-                // Retorno da função aonde é feito a requisição das infos
-                const info_ = await get_info(ativo);
-
-                // Adiciona a info obtida na lista de infos
-                lista_de_infos.push(info_);
-            })
-        )
-            // Caso não encontre erros, retorna a lista de infos +ID
-            .then(function () { res.send(lista_de_infos); })
-
-            // Caso encontre erros, motra a URL aonde ocorreu o erro.
-            .catch(function (err) {
-                if (err.hostname) {
-                    res.status(400).json({ status: 400, message: `Erro ao tentar obter o info de: ${err.hostname}` });
-                } else {
-                    res.status(400).json({ status: 400, message: `Erro desconhecido ao tentar obter o` });
-                }
-
-            });
-    };
-
-    // Chama a função das infos
-    infos();
-
-});
 
 app.listen(process.env.PORT || 8000, () => {
     console.log('App Started...');
 });
 
-verificacao.verificacao(ativos, is_election_on, coordenador);
+verificacao.atualizar_valores(coordenador, is_election_on);
+verificacao.verificacao(ativos);
