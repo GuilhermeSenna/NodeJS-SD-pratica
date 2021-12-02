@@ -361,6 +361,8 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
                     return;
                 } else { // Informar coordenador
 
+                    console.log('ENVIANDO COORDENADOR DO ANEL')
+
                     let body =
                     {
                         "coordenador": coord,
