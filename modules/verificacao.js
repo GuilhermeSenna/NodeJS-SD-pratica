@@ -36,11 +36,6 @@ const verificacao = async (ativos) => {
         // let coordenador = await axios.get("http://localhost:8000/coordenador");
         // coordenador = coordenador.data.coordenador_atual;
 
-
-        console.log(`Coordenador: ${coordenador} / Eleição ativa? - ${is_election_on}`)
-
-
-
         // let mensagem_log =
         // {
         //     "from": "nodejs-sd-guilhermesenna.herokuapp",
@@ -102,7 +97,12 @@ const verificacao = async (ativos) => {
             }
         }
 
+        console.log(` -> Coordenador: ${coordenador} / Eleição ativa? - ${is_election_on}`)
+
         if (verificar && !is_election_on) {
+
+            console.log('->> passou')
+
             let minimo = 5;
             let maximo = 10;
             let timer_gerado = (Math.floor(Math.random() * (maximo - minimo + 1)) + minimo);
