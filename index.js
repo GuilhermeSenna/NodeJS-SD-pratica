@@ -446,6 +446,26 @@ app.post('/eleicao', (req, res) => {
                 // Detecta o tipo de eleição
                 let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(temp.tipo_de_eleicao_ativa);
+
                 //Caso for do tipo valentao
                 if (tipo_eleicao == "valentao") {
 
