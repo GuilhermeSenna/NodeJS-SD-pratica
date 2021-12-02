@@ -49,6 +49,7 @@ let valor = -1;
 let coordenador = -1;
 let is_election_on = false;
 let eleicoes_em_andamento = [];
+let lista_de_eleicoes = [];
 
 app.use(require('./routes/basicas'));
 app.use(require('./routes/info'));
@@ -315,6 +316,84 @@ async function informar_coordenador(id, id_eleicao) {
     );
 }
 
+async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord) {
+    let posicao = index + 1;
+    let cont = 0;
+    let ninguem_apto = false;
+
+    while (true) {
+
+        if (posicao >= ativos_info.length) {
+            posicao = 0;
+        }
+
+        // console.log(ativos_info[posicao].status)
+
+        if (ativos_info[posicao].status == 'online') {
+            const enviar_eleicao_anel = async () => {
+
+                // console.log(ativos_info[posicao].server_endpoint);
+
+                if (eleicao) { // Enviar eleição
+                    let dados_temp = dados;
+                    dados_temp.push('201710376');
+
+                    let body =
+                    {
+                        "id": id_eleicao,
+                        "dados": dados_temp,
+                    }
+
+                    // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
+                    // const url = 'http://localhost:8000/eleicao';
+                    const url = ativos_info[posicao].server_endpoint;
+
+                    console.log(url)
+
+                    const resp = await axios.post(url + 'eleicao', body);
+
+                    if (resp.status != 200) {
+                        functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
+                    } else {
+                        is_election_on = true;
+                    }
+
+                    return;
+                } else { // Informar coordenador
+
+                    let body =
+                    {
+                        "coordenador": coord,
+                        "id_eleicao": id_eleicao
+                    }
+
+                    const resp = await axios.post(url + 'eleicao/coordenador', body);
+
+                    if (resp.status != 200) {
+                        functions.enviar_log("Error", `Erro ao enviar o coordenador`, `Erro ao enviar o novo coordenador para ${url}`);
+                    }
+
+                    return;
+
+                }
+
+            }
+
+            enviar_eleicao_anel();
+            // Push com meu ID na lista e eleições e enviar
+            break;
+        } else {
+            posicao += 1
+            cont += 1;
+
+            if (cont == ativos_info.length) {
+                ninguem_apto = true;
+                return ninguem_apto;
+            }
+        }
+    }
+}
+
 app.post('/eleicao', (req, res) => {
     let atributos = [
         'id',
@@ -451,9 +530,17 @@ app.post('/eleicao', (req, res) => {
                         }
                         // Caso eu seja o novo coordenador
 
-                        return res.status(200).json({
-                            status: 200, message: `Valentão escolhido`
-                        });
+
+                        if (temp.status == 'online') {
+                            return res.status(200).json({
+                                status: 200, message: `Valentão escolhido`
+                            });
+                        } else {
+                            return res.status(404).json({
+                                status: 404, message: `Servidor offline`
+                            });
+                        }
+
                     }
 
                     valentao();
@@ -472,77 +559,27 @@ app.post('/eleicao', (req, res) => {
                         // Pegar info de todos os servidores
 
                         functions.pegar_infos(ativos)
-                            .then(function (ativos_info) {
+                            .then(async function (ativos_info) {
 
                                 // Checar se meu ID está incluso na lista de ID's
 
 
                                 if (!req.body.dados.includes('201710376')) {
                                     // Lista com os infos dos ativos + ID
-                                    if (ativos_info.length) {
+                                    if (ativos_info.length && ativos_info.length != 0) {
 
                                         // Ordenar pelo nome
                                         ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
 
-
                                         let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
 
-                                        // Caso mande para uma posição além do possível, será consertado no início do laço while
-                                        // Exemplo: Posição 2 em um vetor de tamanho 2.
-                                        let posicao = index + 1;
-                                        let cont = 0;
-                                        let ninguem_apto = false;
+                                        let ninguem_apto = await logica_anel(ativos_info, id_eleicao, req.body.dados, index, true, '');
 
-                                        while (true) {
-                                            if (posicao >= ativos_info.length) {
-                                                posicao = 0;
+                                        if (typeof ninguem_apto != 'undefined') {
+                                            if (ninguem_apto) {
+                                                functions.enviar_log("Error", `Eleição cancelada - Todos os servidores offlines`, `A eleição ${id_eleicao} está sendo cancelada, pois todos os servidores estão offline, logo não é possível decidir o coordenador.`);
+                                                eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                             }
-
-                                            if (ativos_info[posicao].status == 'online') {
-                                                const enviar_eleicao_anel = async () => {
-
-                                                    console.log(ativos_info[posicao])
-
-                                                    let dados_temp = req.body.dados;
-                                                    dados_temp.push('201710376');
-                                                    dados_temp.push('201710375');
-                                                    dados_temp.push('201710377');
-
-                                                    let body =
-                                                    {
-                                                        "id": functions.gerar_id_eleicao(),
-                                                        "dados": dados_temp,
-                                                    }
-
-                                                    // const url = 'https://nodejs-sd-guilhermesenna.herokuapp.com/eleicao';
-                                                    const url = 'http://localhost:8000/eleicao';
-
-                                                    const resp = await axios.post(url, body);
-
-                                                    if (resp.status != 200) {
-                                                        functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
-                                                    } else {
-                                                        is_election_on = true;
-                                                    }
-                                                }
-
-                                                enviar_eleicao_anel()
-                                                // Push com meu ID na lista e eleições e enviar
-                                                break;
-                                            } else {
-                                                posicao += 1
-                                                cont += 1;
-
-                                                if (cont == ativos_info.length) {
-                                                    ninguem_apto = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        if (ninguem_apto) {
-                                            functions.enviar_log("Error", `Eleição cancelada - Todos os servidores offlines`, `A eleição ${id_eleicao} está sendo cancelada, pois todos os servidores estão offline, logo não é possível decidir o coordenador.`);
-                                            eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
                                         }
                                     } else {
                                         functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos.`);
@@ -553,24 +590,23 @@ app.post('/eleicao', (req, res) => {
                                     // Quando meu ID está no array
 
                                     var max = Math.max.apply(null, req.body.dados);
-
-                                    if (max == 201710376) {
-                                        console.log("aca")
-                                    }
-
-                                    // console.log(`[${functions.horario_atual()}] (Sou o coordenador) - Ninguém recebeu`)
-                                    // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 201710376, eleicoes_em_andamento, "Nenhum servidor recebeu");
-                                    // await informar_coordenador(201710376, id_eleicao);
-                                    // coordenador = 201710376;
-
+                                    eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", max, eleicoes_em_andamento, "");
+                                    await logica_anel(ativos_info, id_eleicao, req.body.dados, index, false, max);
+                                    coordenador = max;
 
                                 }
 
                             });
 
-                        return res.status(200).json({
-                            status: 200, message: `Anel escolhido`
-                        });
+                        if (temp.status == 'online') {
+                            return res.status(200).json({
+                                status: 200, message: `Anel escolhido`
+                            });
+                        } else {
+                            return res.status(404).json({
+                                status: 404, message: `Servidor offline`
+                            });
+                        }
                     }
                     // Caso eu seja o novo coordenador
 
@@ -606,6 +642,14 @@ app.post('/eleicao/coordenador', (req, res) => {
     is_election_on = false;
     verificacao.atualizar_valores(coordenador, is_election_on);
 
+    if (lista_de_eleicoes.includes(req.body.id_eleicao)) {
+        return res.status(400).json({
+            status: 400, message: `Essa eleição já foi respondida`
+        });
+    } else {
+        lista_de_eleicoes.push(req.body.id_eleicao);
+    }
+
     console.log(`[${functions.horario_atual()}] (Novo coordenador recebido) - ID eleição: ${req.body.id_eleicao} / novo coordenador: ${coordenador}`);
 
     let atributos = [
@@ -637,33 +681,60 @@ app.post('/eleicao/coordenador', (req, res) => {
         }
     }
 
-    // Tornado falso para checar se acha um ID presente entre os procurados
-    // check = false;
+    //
+    fs.readFile('info.json', function (err, data) {
 
-    // Checa se o nome e o ID solicitado para alteração já não é usado por outro usuário
-    // for (var i = 0; i < ativos.length; i++) {
-    //     // console.log(`ID-Parâmetro ${id} / ID-Requisição ${req.body.id} / ID-Usuário ${ativos[i].id}`);
+        if (!err) {
 
-    //     // [ADICIONAR] Adicionar checagem se o id_eleicao existe e é ativo
-    //     if ((ativos[i].id == id)) {
-    //         check = true;
-    //         break;
-    //     }
-    // }
+            var temp = JSON.parse(data.toString());
 
-    // if (!check) {
-    //     return res.status(409).json({ status: 409, message: `ID não presente entre os ativos.` });
-    // } else {
+            let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
-    // }
+            if (tipo_eleicao == "valentao") {
 
 
-    if (check) {
-        coordenador = req.body.coordenador;
-        eleicoes_em_andamento = functions.remover_eleicao(req.body.id_eleicao, "", 0, eleicoes_em_andamento, '');
-        functions.enviar_log("Success", `Novo coordenador recebido`, `O novo coordenador '${coordenador}' foi recebido, resultado da eleição '${req.body.id_eleicao}'.`);
-        res.send(`Novo coordenador '${coordenador}' adicionado, resultado da eleição '${req.body.id_eleicao}'. Cheque o log para mais informações`);
-    }
+                if (check) {
+                    coordenador = req.body.coordenador;
+                    eleicoes_em_andamento = functions.remover_eleicao(req.body.id_eleicao, "", 0, eleicoes_em_andamento, '');
+                    functions.enviar_log("Success", `Novo coordenador recebido`, `O novo coordenador '${coordenador}' foi recebido, resultado da eleição '${req.body.id_eleicao}'.`);
+                    res.send(`Novo coordenador '${coordenador}' adicionado, resultado da eleição '${req.body.id_eleicao}'. Cheque o log para mais informações`);
+                }
+
+            } else {
+
+                functions.pegar_infos(ativos)
+                    .then(async function (ativos_info) {
+
+                        // Lista com os infos dos ativos + ID
+                        if (ativos_info.length && ativos_info.length != 0) {
+
+                            // Ordenar pelo nome
+                            ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
+
+                            let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
+
+                            coordenador = req.body.coordenador;
+
+                            await logica_anel(ativos_info, req.body.id_eleicao, '', index, false, coordenador);
+
+                        } else {
+                            // functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos.`);
+                            // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+                        }
+
+
+                    });
+
+
+            }
+
+
+
+        } else {
+            res.send(err);
+        }
+
+    });
 
 });
 

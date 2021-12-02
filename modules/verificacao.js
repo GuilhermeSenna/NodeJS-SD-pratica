@@ -21,21 +21,6 @@ async function ler_arquivo() {
 
 }
 
-// async function carregar_info() {
-
-//     let temp;
-//     await fs.readFile('info.json', function (err, data) {
-//         if (!err) {
-//             temp = JSON.parse(data.toString());
-//             console.log(`1 -> ${temp}`)
-//         } else {
-
-//         }
-//     });
-
-//     console.log(`2 -> ${temp}`)
-//     return temp;
-// }
 
 // Verificacao contínua se o coordenador está online
 const verificacao = async (ativos) => {
