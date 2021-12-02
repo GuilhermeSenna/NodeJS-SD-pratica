@@ -361,26 +361,25 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
 
                     return;
                 }
+                else { // Informar coordenador
 
-                // else { // Informar coordenador
+                    console.log('ENVIANDO COORDENADOR DO ANEL')
 
-                //     console.log('ENVIANDO COORDENADOR DO ANEL')
+                    let body =
+                    {
+                        "coordenador": coord,
+                        "id_eleicao": id_eleicao
+                    }
 
-                //     let body =
-                //     {
-                //         "coordenador": coord,
-                //         "id_eleicao": id_eleicao
-                //     }
+                    const resp = await axios.post(url + 'eleicao/coordenador', body);
 
-                //     const resp = await axios.post(url + 'eleicao/coordenador', body);
+                    if (resp.status != 200) {
+                        functions.enviar_log("Error", `Erro ao enviar o coordenador`, `Erro ao enviar o novo coordenador para ${url}`);
+                    }
 
-                //     if (resp.status != 200) {
-                //         functions.enviar_log("Error", `Erro ao enviar o coordenador`, `Erro ao enviar o novo coordenador para ${url}`);
-                //     }
+                    return;
 
-                //     return;
-
-                // }
+                }
 
             }
 
@@ -584,7 +583,7 @@ app.post('/eleicao', (req, res) => {
 
                                         let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
 
-                                        let ninguem_apto = await logica_anel(ativos_info, id_eleicao, req.body.dados, index, true, '');
+                                        // let ninguem_apto = await logica_anel(ativos_info, id_eleicao, req.body.dados, index, true, '');
 
                                         if (typeof ninguem_apto != 'undefined') {
                                             if (ninguem_apto) {
