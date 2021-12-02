@@ -334,6 +334,8 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
 
                 // console.log(ativos_info[posicao].server_endpoint);
 
+                console.log(eleicao);
+
                 if (eleicao) { // Enviar eleição
                     let dados_temp = dados;
                     dados_temp.push('201710376');
@@ -583,7 +585,7 @@ app.post('/eleicao', (req, res) => {
 
                                         let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
 
-                                        // let ninguem_apto = await logica_anel(ativos_info, id_eleicao, req.body.dados, index, true, '');
+                                        let ninguem_apto = await logica_anel(ativos_info, id_eleicao, req.body.dados, index, true, '');
 
                                         if (typeof ninguem_apto != 'undefined') {
                                             if (ninguem_apto) {
