@@ -102,6 +102,12 @@ const verificacao = async (ativos) => {
         if (verificar && !is_election_on) {
 
             console.log('->> passou')
+            console.log('->> passou')
+            console.log('->> passou')
+            console.log('->> passou')
+            console.log('->> passou')
+            console.log('->> passou')
+            console.log('->> passou')
 
             let minimo = 5;
             let maximo = 10;
