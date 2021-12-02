@@ -599,6 +599,7 @@ app.post('/eleicao', (req, res) => {
 
                                     is_election_on = false;
                                     var max = Math.max.apply(null, req.body.dados);
+                                    console.log(`max -> ${max}`)
                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", max, eleicoes_em_andamento, "");
                                     await informar_coordenador(max, id_eleicao);
                                     coordenador = max;
