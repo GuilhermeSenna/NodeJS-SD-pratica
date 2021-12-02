@@ -356,6 +356,7 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
                         functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
                     } else {
                         is_election_on = true;
+                        verificacao.atualizar_valores(-1, true);
                     }
 
                     return;
