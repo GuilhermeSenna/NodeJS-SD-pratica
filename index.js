@@ -360,25 +360,27 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
                     }
 
                     return;
-                } else { // Informar coordenador
-
-                    console.log('ENVIANDO COORDENADOR DO ANEL')
-
-                    let body =
-                    {
-                        "coordenador": coord,
-                        "id_eleicao": id_eleicao
-                    }
-
-                    const resp = await axios.post(url + 'eleicao/coordenador', body);
-
-                    if (resp.status != 200) {
-                        functions.enviar_log("Error", `Erro ao enviar o coordenador`, `Erro ao enviar o novo coordenador para ${url}`);
-                    }
-
-                    return;
-
                 }
+
+                // else { // Informar coordenador
+
+                //     console.log('ENVIANDO COORDENADOR DO ANEL')
+
+                //     let body =
+                //     {
+                //         "coordenador": coord,
+                //         "id_eleicao": id_eleicao
+                //     }
+
+                //     const resp = await axios.post(url + 'eleicao/coordenador', body);
+
+                //     if (resp.status != 200) {
+                //         functions.enviar_log("Error", `Erro ao enviar o coordenador`, `Erro ao enviar o novo coordenador para ${url}`);
+                //     }
+
+                //     return;
+
+                // }
 
             }
 
