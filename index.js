@@ -446,28 +446,48 @@ app.post('/eleicao', (req, res) => {
                 // Detecta o tipo de eleição
                 let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
-                console.log(temp.tipo_de_eleicao_ativa);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
+                console.log(tipo_eleicao);
 
                 //Caso for do tipo valentao
                 if (tipo_eleicao == "valentao") {
+
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
+                    console.log('Entrou no valentao');
 
                     const valentao = async () => {
                         // Log para avisar que o algoritmo está em execução
