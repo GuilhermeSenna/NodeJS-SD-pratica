@@ -554,7 +554,7 @@ app.post('/eleicao', (req, res) => {
 
                     const anel = async () => {
                         // Log para avisar que o algoritmo está em execução
-                        // await functions.enviar_log("Attention", `Eleição em processamento (anel)`, `A eleição '${id_eleicao}' está em processamento, em breve será decidido um novo coordenador.`);
+                        await functions.enviar_log("Attention", `Eleição em processamento (anel)`, `A eleição '${id_eleicao}' está em processamento, em breve será decidido um novo coordenador.`);
 
                         // Adicionando a eleição na lista de eleições em andamento
                         eleicoes_em_andamento.push(req.body.id);
