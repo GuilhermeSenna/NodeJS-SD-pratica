@@ -350,14 +350,14 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
 
                     console.log(url)
 
-                    // const resp = await axios.post(url + 'eleicao', body);
+                    const resp = await axios.post(url + 'eleicao', body);
 
-                    // if (resp.status != 200) {
-                    //     functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
-                    // } else {
-                    //     is_election_on = true;
-                    //     verificacao.atualizar_valores(-1, true);
-                    // }
+                    if (resp.status != 200) {
+                        functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
+                    } else {
+                        is_election_on = true;
+                        verificacao.atualizar_valores(-1, true);
+                    }
 
                     return;
                 }
