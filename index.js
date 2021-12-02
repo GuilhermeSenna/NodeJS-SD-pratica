@@ -174,7 +174,7 @@ app.get('/coordenador', (req, res) => {
     } else {
         json = {
             "coordenador": false,
-            "coordenador_atual": toString(coordenador)
+            "coordenador_atual": coordenador
         };
     }
 
