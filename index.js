@@ -563,6 +563,8 @@ app.post('/eleicao', (req, res) => {
 
                                 // Checar se meu ID está incluso na lista de ID's
 
+                                console.log(`Eleição Dados - ${req.body.dados}`)
+
 
                                 if (!req.body.dados.includes('201710376')) {
                                     // Lista com os infos dos ativos + ID
@@ -589,6 +591,7 @@ app.post('/eleicao', (req, res) => {
 
                                     // Quando meu ID está no array
 
+                                    is_election_on = false;
                                     var max = Math.max.apply(null, req.body.dados);
                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", max, eleicoes_em_andamento, "");
                                     await informar_coordenador(max, id_eleicao);
@@ -647,6 +650,9 @@ app.post('/eleicao/coordenador', (req, res) => {
     verificacao.atualizar_valores(coordenador, is_election_on);
 
     if (lista_de_eleicoes.includes(req.body.id_eleicao)) {
+
+        functions.enviar_log("Warning", `eleicao/coordenador - id_eleicao: ${req.body.id_eleicao}`, `Eleição já respondida`);
+
         return res.status(400).json({
             status: 400, message: `Essa eleição já foi respondida`
         });

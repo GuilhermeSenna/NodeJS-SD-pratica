@@ -4,5 +4,5 @@
     "descricao": "Projeto de SD. Os seguintes serviços estão implementados: info, peers, recurso, eleicao, etc",
     "versao": "0.1",
     "status": "online",
-    "tipo_de_eleicao_ativa": "valentao"
+    "tipo_de_eleicao_ativa": "anel"
 }
