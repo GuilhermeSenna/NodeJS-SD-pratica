@@ -591,8 +591,12 @@ app.post('/eleicao', (req, res) => {
 
                                     var max = Math.max.apply(null, req.body.dados);
                                     eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", max, eleicoes_em_andamento, "");
-                                    await logica_anel(ativos_info, id_eleicao, req.body.dados, index, false, max);
+                                    await informar_coordenador(max, id_eleicao);
                                     coordenador = max;
+
+                                    // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", max, eleicoes_em_andamento, "");
+                                    // await logica_anel(ativos_info, id_eleicao, req.body.dados, index, false, max);
+                                    // coordenador = max;
 
                                 }
 
@@ -682,59 +686,61 @@ app.post('/eleicao/coordenador', (req, res) => {
     }
 
     //
-    fs.readFile('info.json', function (err, data) {
+    // fs.readFile('info.json', function (err, data) {
 
-        if (!err) {
+    //     if (!err) {
 
-            var temp = JSON.parse(data.toString());
+    //         var temp = JSON.parse(data.toString());
 
-            let tipo_eleicao = temp.tipo_de_eleicao_ativa;
+    // let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
-            if (tipo_eleicao == "valentao") {
-
-
-                if (check) {
-                    coordenador = req.body.coordenador;
-                    eleicoes_em_andamento = functions.remover_eleicao(req.body.id_eleicao, "", 0, eleicoes_em_andamento, '');
-                    functions.enviar_log("Success", `Novo coordenador recebido`, `O novo coordenador '${coordenador}' foi recebido, resultado da eleição '${req.body.id_eleicao}'.`);
-                    res.send(`Novo coordenador '${coordenador}' adicionado, resultado da eleição '${req.body.id_eleicao}'. Cheque o log para mais informações`);
-                }
-
-            } else {
-
-                functions.pegar_infos(ativos)
-                    .then(async function (ativos_info) {
-
-                        // Lista com os infos dos ativos + ID
-                        if (ativos_info.length && ativos_info.length != 0) {
-
-                            // Ordenar pelo nome
-                            ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
-
-                            let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
-
-                            coordenador = req.body.coordenador;
-
-                            await logica_anel(ativos_info, req.body.id_eleicao, '', index, false, coordenador);
-
-                        } else {
-                            // functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos.`);
-                            // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
-                        }
+    // if (tipo_eleicao == "valentao") {
 
 
-                    });
+    if (check) {
+        coordenador = req.body.coordenador;
+        eleicoes_em_andamento = functions.remover_eleicao(req.body.id_eleicao, "", 0, eleicoes_em_andamento, '');
+        functions.enviar_log("Success", `Novo coordenador recebido`, `O novo coordenador '${coordenador}' foi recebido, resultado da eleição '${req.body.id_eleicao}'.`);
+        res.send(`Novo coordenador '${coordenador}' adicionado, resultado da eleição '${req.body.id_eleicao}'. Cheque o log para mais informações`);
+    }
+
+    // } 
+
+    // else {
+
+    //     functions.pegar_infos(ativos)
+    //         .then(async function (ativos_info) {
+
+    //             // Lista com os infos dos ativos + ID
+    //             if (ativos_info.length && ativos_info.length != 0) {
+
+    //                 // Ordenar pelo nome
+    //                 ativos_info.sort((a, b) => (a.nome > b.nome) ? 1 : ((b.nome > a.nome) ? -1 : 0));
+
+    //                 let index = ativos_info.findIndex(ativos => ativos.id === '201710376');
+
+    //                 coordenador = req.body.coordenador;
+
+    //                 await logica_anel(ativos_info, req.body.id_eleicao, '', index, false, coordenador);
+
+    //             } else {
+    //                 // functions.enviar_log("Error", `Eleição cancelada - Sem info ou poucos servidores`, `Esse erro ocorre quando nenhum servidor é retornado ao se pedir a lista de infos.`);
+    //                 // eleicoes_em_andamento = functions.remover_eleicao(id_eleicao, "valentao", 0, eleicoes_em_andamento, '');
+    //             }
 
 
-            }
+    //         });
+
+
+    // }
 
 
 
-        } else {
-            res.send(err);
-        }
+    // } else {
+    //     res.send(err);
+    // }
 
-    });
+    // });
 
 });
 
