@@ -354,6 +354,9 @@ async function logica_anel(ativos_info, id_eleicao, dados, index, eleicao, coord
 
                     if (resp.status != 200) {
                         functions.enviar_log("Error", `Erro ao enviar a eleição`, `Erro ao enviar eleição para ${url}`);
+                    } else {
+                        is_election_on = true;
+                        verificacao.atualizar_valores(-1, true);
                     }
 
                     return;
@@ -653,6 +656,8 @@ app.post('/eleicao/coordenador', (req, res) => {
     // let id = req.params.id;
 
     is_election_on = false;
+
+    coordenador = req.body.coordenador;
     verificacao.atualizar_valores(coordenador, is_election_on);
 
     if (lista_de_eleicoes.includes(req.body.id_eleicao)) {
@@ -710,7 +715,6 @@ app.post('/eleicao/coordenador', (req, res) => {
 
 
     if (check) {
-        coordenador = req.body.coordenador;
         eleicoes_em_andamento = functions.remover_eleicao(req.body.id_eleicao, "", 0, eleicoes_em_andamento, '');
         functions.enviar_log("Success", `Novo coordenador recebido`, `O novo coordenador '${coordenador}' foi recebido, resultado da eleição '${req.body.id_eleicao}'.`);
         res.send(`Novo coordenador '${coordenador}' adicionado, resultado da eleição '${req.body.id_eleicao}'. Cheque o log para mais informações`);
