@@ -447,46 +447,10 @@ app.post('/eleicao', (req, res) => {
                 let tipo_eleicao = temp.tipo_de_eleicao_ativa;
 
                 console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
-                console.log(tipo_eleicao);
 
                 //Caso for do tipo valentao
                 if (tipo_eleicao == "valentao") {
 
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
-                    console.log('Entrou no valentao');
                     console.log('Entrou no valentao');
 
                     const valentao = async () => {
