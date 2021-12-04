@@ -101,14 +101,6 @@ const verificacao = async (ativos) => {
 
         if (verificar && !is_election_on) {
 
-            console.log('->> passou')
-            console.log('->> passou')
-            console.log('->> passou')
-            console.log('->> passou')
-            console.log('->> passou')
-            console.log('->> passou')
-            console.log('->> passou')
-
             let minimo = 5;
             let maximo = 10;
             let timer_gerado = (Math.floor(Math.random() * (maximo - minimo + 1)) + minimo);
