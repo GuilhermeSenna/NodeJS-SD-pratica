@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let ativos = [
-    {
-        "id": "201720295",
-        "nome": "Allana Dos Santos Campos",
-        "url": "https://sd-ascampos-20212.herokuapp.com/"
-    },
+    // {
+    //     "id": "201720295",
+    //     "nome": "Allana Dos Santos Campos",
+    //     "url": "https://sd-ascampos-20212.herokuapp.com/"
+    // },
     {
         "id": "201710376",
         "nome": "Guilherme Senna Cruz",
