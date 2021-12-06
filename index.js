@@ -166,7 +166,7 @@ app.get('/coordenador', (req, res) => {
 
     let json;
 
-    if (coordenador == 201710376) {
+    if (coordenador == "201710376") {
         json = {
             "coordenador": true,
             "coordenador_atual": "201710376"
