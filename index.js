@@ -15,11 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let ativos = [
-    {
-        "id": "201720295",
-        "nome": "Allana Dos Santos Campos",
-        "url": "https://sd-ascampos-20212.herokuapp.com/"
-    },
+    // {
+    //     "id": "201720295",
+    //     "nome": "Allana Dos Santos Campos",
+    //     "url": "https://sd-ascampos-20212.herokuapp.com/"
+    // },
     {
         "id": "201710376",
         "nome": "Guilherme Senna Cruz",
@@ -298,7 +298,7 @@ async function informar_coordenador(id, id_eleicao) {
                 data: mensagem
             })
                 .then(async function (response) {
-                    await functions.enviar_log("Success", `Novo coordenador enviado`, `O novo coordenador '${id}' da eleição '${id_eleicao}' foi enviado com sucesso para '${ativo.url}'`);
+                    // await functions.enviar_log("Success", `Novo coordenador enviado`, `O novo coordenador '${id}' da eleição '${id_eleicao}' foi enviado com sucesso para '${ativo.url}'`);
                     alguem_recebeu = true;
                 })
                 .catch(async function (error) {
