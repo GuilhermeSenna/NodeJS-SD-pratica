@@ -55,7 +55,7 @@ const verificacao = async (ativos) => {
         if (coordenador == -1) { // -1 é o número quando o servidor inicia pela primeira vez
             // Avisar da flag
             verificar = true;
-        } else if (coordenador == 201710376) { // Se o coordenador for eu
+        } else if (coordenador == '201710376') { // Se o coordenador for eu
 
             // Lê o info
             let leitura = await ler_arquivo();
@@ -124,7 +124,7 @@ const verificacao = async (ativos) => {
             if (coordenador == -1) { // -1 é o número quando o servidor inicia pela primeira vez
                 // Avisar da flag
                 verificar = true;
-            } else if (coordenador == 201710376) { // Se o coordenador for eu
+            } else if (coordenador == '201710376') { // Se o coordenador for eu
 
                 // Lê o info
                 let leitura = await ler_arquivo();
