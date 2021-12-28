@@ -2,6 +2,8 @@
  
 ### Programa utilizado para disciplina de SD (Sistemas distribuídos) sendo realizado um deploy no heroku.
 
+#### Sistema projetado para trabalhar em paralelo/cooperativamente com outros sistemas dos colegas da disciplina, dessa forma os sistemas atuarão como um sistema distribuído simples. Os sistemas foram criados para recebem certas demandas e também se comunicar e decidir nos algoritmos de eleição tanto do valentão (bully) quanto do anel (ring).
+
 ## Link:  [Repositório oficial](https://github.com/profmathias/cet-100)
 
 ### Rotas presentes:
